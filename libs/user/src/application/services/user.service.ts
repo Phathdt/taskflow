@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 
 import { type IUserRepository, type IUserService, type User, type UserWithPassword } from '../../domain'
-import { USER_REPOSITORY } from '../../infras'
+import { USER_REPOSITORY } from '../../infras/di'
 
 @Injectable()
 export class UserService implements IUserService {
