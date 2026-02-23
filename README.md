@@ -189,11 +189,10 @@ docker-compose up -d postgres-db redis-db
 ### Build Docker Image
 
 ```bash
-docker build \
-  --build-arg APP_NAME=api \
-  --build-arg GH_PAT=<github-token> \
-  -t taskflow:latest .
+docker build --build-arg APP_NAME=api -t taskflow:latest .
 ```
+
+Final image: **~143MB** (multi-stage build with Node.js 24 Alpine)
 
 ### Run Full Stack
 
