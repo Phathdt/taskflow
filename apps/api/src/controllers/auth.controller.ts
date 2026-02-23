@@ -3,12 +3,16 @@ import {
   AUTH_SERVICE,
   CurrentUser,
   LoginDto,
+  LoginResponseSchema,
+  LogoutResponseSchema,
+  MeResponseSchema,
   Public,
   RegisterDto,
+  RegisterResponseSchema,
   type IAuthService,
   type JwtPayload,
 } from '@taskflow/auth'
-import { SnakeToCamelInterceptor, TransformedBody } from '@taskflow/share'
+import { SnakeToCamelInterceptor, TransformedBody, UseResponseSchema } from '@taskflow/share'
 
 import { AuthGuard, RolesGuard } from '../guards'
 
@@ -21,6 +25,10 @@ export class AuthController {
   @Post('/register')
   @Public()
   @HttpCode(HttpStatus.CREATED)
+  @UseResponseSchema('Register', 'Creates a new user account', RegisterResponseSchema, {
+    status: HttpStatus.CREATED,
+    auth: false,
+  })
   async register(@TransformedBody() dto: RegisterDto) {
     return this.authService.register(dto)
   }
@@ -28,6 +36,7 @@ export class AuthController {
   @Post('/login')
   @Public()
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Login', 'Authenticates user and returns access token', LoginResponseSchema, { auth: false })
   async login(@TransformedBody() dto: LoginDto) {
     const result = await this.authService.login(dto)
     return {
@@ -38,12 +47,14 @@ export class AuthController {
 
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Logout', 'Invalidates the current session', LogoutResponseSchema)
   async logout(@CurrentUser() user: JwtPayload) {
     await this.authService.logout(user.userId, user.subToken)
     return { message: 'Logged out successfully' }
   }
 
   @Get('/me')
+  @UseResponseSchema('Get current user', 'Returns the authenticated user profile', MeResponseSchema)
   async me(@CurrentUser() user: JwtPayload) {
     return this.authService.me(user.userId)
   }

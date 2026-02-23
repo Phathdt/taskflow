@@ -12,8 +12,16 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { CurrentUser, Roles, type JwtPayload } from '@taskflow/auth'
-import { SnakeToCamelInterceptor, TransformedBody, TransformedQuery } from '@taskflow/share'
-import { ChangeRoleDto, ListUsersDto, Role, USER_SERVICE, type IUserService } from '@taskflow/user'
+import { SnakeToCamelInterceptor, TransformedBody, TransformedQuery, UseResponseSchema } from '@taskflow/share'
+import {
+  ChangeRoleDto,
+  ListUsersDto,
+  Role,
+  USER_SERVICE,
+  UserListResponseSchema,
+  UserResponseSchema,
+  type IUserService,
+} from '@taskflow/user'
 
 import { AuthGuard, RolesGuard } from '../guards'
 
@@ -26,12 +34,14 @@ export class UserController {
   @Get()
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('List users', 'Returns paginated list of users', UserListResponseSchema)
   async list(@TransformedQuery() query: ListUsersDto) {
     return this.userService.findAll(query)
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Get user', 'Returns a single user by ID', UserResponseSchema)
   async getById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
     if (user.role !== Role.ADMIN && user.userId !== id) {
       throw new ForbiddenException('You can only view your own profile')
@@ -42,6 +52,7 @@ export class UserController {
   @Patch(':id/role')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Change user role', 'Updates the role of a user', UserResponseSchema)
   async changeRole(
     @Param('id', ParseIntPipe) id: number,
     @TransformedBody() dto: ChangeRoleDto,

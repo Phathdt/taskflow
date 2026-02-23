@@ -13,12 +13,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { CurrentUser, Roles, type JwtPayload } from '@taskflow/auth'
-import { SnakeToCamelInterceptor, TransformedBody, TransformedQuery } from '@taskflow/share'
+import { SnakeToCamelInterceptor, TransformedBody, TransformedQuery, UseResponseSchema } from '@taskflow/share'
 import {
   AssignTaskDto,
   CreateTaskDto,
   ListTasksDto,
   TASK_SERVICE,
+  TaskDeleteResponseSchema,
+  TaskListResponseSchema,
+  TaskResponseSchema,
   UpdateTaskDto,
   type ITaskService,
 } from '@taskflow/task'
@@ -35,6 +38,7 @@ export class TaskController {
   @Post()
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.CREATED)
+  @UseResponseSchema('Create task', 'Creates a new task', TaskResponseSchema, { status: HttpStatus.CREATED })
   async create(@TransformedBody() dto: CreateTaskDto, @CurrentUser() user: JwtPayload) {
     return this.taskService.create({
       title: dto.title,
@@ -48,18 +52,21 @@ export class TaskController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('List tasks', 'Returns paginated list of tasks', TaskListResponseSchema)
   async list(@TransformedQuery() query: ListTasksDto, @CurrentUser() user: JwtPayload) {
     return this.taskService.findAll(user.userId, user.role, query)
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Get task', 'Returns a single task by ID', TaskResponseSchema)
   async getById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
     return this.taskService.findById(id, user.userId, user.role)
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Update task', 'Updates an existing task', TaskResponseSchema)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @TransformedBody() dto: UpdateTaskDto,
@@ -71,6 +78,7 @@ export class TaskController {
   @Delete(':id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Delete task', 'Deletes a task by ID', TaskDeleteResponseSchema)
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.taskService.delete(id)
     return { message: 'Task deleted successfully' }
@@ -79,6 +87,7 @@ export class TaskController {
   @Patch(':id/assign')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
+  @UseResponseSchema('Assign task', 'Assigns a task to a user', TaskResponseSchema)
   async assign(@Param('id', ParseIntPipe) id: number, @TransformedBody() dto: AssignTaskDto) {
     return this.taskService.assign(id, dto.assigneeId)
   }
