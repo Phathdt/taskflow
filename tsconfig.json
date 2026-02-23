@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@taskflow/custom-config": ["dist/libs/custom-config/index"],
+      "@taskflow/custom-logger": ["dist/libs/custom-logger/index"],
+      "@taskflow/database": ["dist/libs/database/index"],
+      "@taskflow/share": ["dist/libs/share/index"],
+      "@taskflow/auth": ["dist/libs/auth/index"],
+      "@taskflow/user": ["dist/libs/user/index"],
+      "@taskflow/task": ["dist/libs/task/index"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", "coverage"]
+}

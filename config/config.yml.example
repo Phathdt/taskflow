@@ -1,0 +1,26 @@
+# Host configuration
+host:
+  port: 3000
+
+# Database configuration
+database:
+  url: postgresql://postgres:postgres@localhost:15432/taskflow?schema=public
+
+# Redis configuration
+redis:
+  url: redis://localhost:16379
+
+# Auth configuration
+auth:
+  bcrypt_rounds: 10
+  session_ttl_seconds: 2592000 # 30 days
+
+# JWT configuration
+jwt:
+  secret: replace_me
+  expires_in: 30d
+
+# Logging configuration
+log:
+  level: debug
+  enable_json_format: false

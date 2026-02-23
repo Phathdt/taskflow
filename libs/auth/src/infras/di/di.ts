@@ -1,0 +1,3 @@
+export const AUTH_SERVICE = Symbol('AUTH_SERVICE')
+export const JWT_TOKEN_SERVICE = Symbol('JWT_TOKEN_SERVICE')
+export const SESSION_STORE_SERVICE = Symbol('SESSION_STORE_SERVICE')

@@ -1,0 +1,6 @@
+{
+  "watch": ["apps/api/src", "libs"],
+  "ext": "ts",
+  "ignore": ["node_modules", "dist", "**/*.spec.ts"],
+  "exec": "ts-node -r tsconfig-paths/register --transpile-only --project tsconfig.dev.json apps/api/src/main.ts"
+}

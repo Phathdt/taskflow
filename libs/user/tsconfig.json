@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.dev.json",
+  "compilerOptions": {
+    "outDir": "../../dist/libs/user",
+    "noEmit": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

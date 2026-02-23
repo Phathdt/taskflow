@@ -1,0 +1,31 @@
+{
+  "output": {
+    "filePath": "repomix-output.txt",
+    "style": "plain",
+    "headerText": "Custom header information for the packed file.",
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "showLineNumbers": false,
+    "copyToClipboard": true,
+    "topFilesLength": 5,
+    "includeEmptyDirectories": false
+  },
+  "include": ["**/src/**/*"],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "**/*.log",
+      ".github",
+      "abi",
+      "prisma/migrations",
+      "schema.gen.sql",
+      "**/*.md",
+      "**/mock",
+      "**/__tests__"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

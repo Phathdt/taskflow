@@ -1,0 +1,38 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../libs/database/src/generated/prisma"
+  moduleFormat = "commonjs"
+}
+
+model User {
+  id       Int    @id @default(autoincrement()) @map("id")
+  email    String @unique @map("email")
+  password String @map("password")
+  name     String @map("name")
+  role     String @default("worker") @map("role")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Task {
+  id          Int       @id @default(autoincrement()) @map("id")
+  title       String    @map("title")
+  description String?   @map("description")
+  status      String    @default("pending") @map("status")
+  priority    String    @default("medium") @map("priority")
+  dueDate     DateTime? @map("due_date")
+  createdById Int       @map("created_by_id")
+  assigneeId  Int?      @map("assignee_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tasks")
+}

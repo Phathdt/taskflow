@@ -1,0 +1,51 @@
+{
+  "name": "@apps/api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rolldown -c",
+    "build:prod": "yarn typecheck && yarn build",
+    "dev": "cd ../.. && nodemon --config apps/api/nodemon.json",
+    "start": "node ../../dist/apps/api/main",
+    "start:prod": "node ../../dist/apps/api/main",
+    "test": "jest --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@taskflow/auth": "*",
+    "@taskflow/custom-config": "*",
+    "@taskflow/custom-logger": "*",
+    "@taskflow/share": "*",
+    "@keyv/redis": "^5.1.6",
+    "@nestjs/cache-manager": "^3.1.0",
+    "@nestjs/common": "^11.1.14",
+    "@nestjs/core": "^11.1.14",
+    "@nestjs/platform-express": "^11.1.14",
+    "@nestjs/swagger": "^11.2.6",
+    "cache-manager": "^7.2.8",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "keyv": "^5.6.0",
+    "nestjs-cls": "^6.2.0",
+    "nestjs-pino": "^4.6.0",
+    "nestjs-zod": "^5.1.1",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@nestjs/schematics": "^11.0.9",
+    "@nestjs/testing": "^11.1.14",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "~25.3.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.14",
+    "ts-jest": "^29.4.6",
+    "ts-node": "10.9.2",
+    "typescript": "~5.9.3"
+  }
+}

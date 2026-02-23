@@ -1,0 +1,96 @@
+{
+  "name": "taskflow",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --filter=@apps/api",
+    "build": "turbo run build",
+    "api:build": "turbo run build --filter=@apps/api",
+    "build:prod": "turbo run build:prod",
+    "test": "turbo run test",
+    "test:ci": "turbo run test --filter='./libs/*' -- --ci --coverage",
+    "lint": "eslint apps libs --fix",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,json}\"",
+    "clean": "rm -rf dist .turbo node_modules",
+    "db:migrate": "prisma migrate dev --config=prisma/prisma.config.ts",
+    "db:migrate:create": "prisma migrate dev --create-only --config=prisma/prisma.config.ts",
+    "db:reset": "prisma migrate reset --config=prisma/prisma.config.ts",
+    "db:deploy": "npx prisma migrate deploy --config=prisma/prisma.config.ts",
+    "db:status": "npx prisma migrate status --config=prisma/prisma.config.ts",
+    "db:resolve": "npx prisma migrate resolve --config=prisma/prisma.config.ts",
+    "db:generate": "prisma generate",
+    "db:studio": "npx prisma studio",
+    "db:seed": "npx ts-node prisma/seed.ts",
+    "ctix": "node generate-indexes.js",
+    "lint-staged": "lint-staged",
+    "commit": "git-cz",
+    "prepare": "husky",
+    "check:unused": "node unused-detector.js",
+    "check:unused:ci": "node unused-detector.js --exit-code",
+    "sync:deps": "npx ts-node scripts/sync-package-deps.ts",
+    "sync:deps:dry": "npx ts-node scripts/sync-package-deps.ts --dry-run",
+    "sync:deps:strict": "npx ts-node scripts/sync-package-deps.ts --strict --check-versions"
+  },
+  "resolutions": {
+    "@bull-board/express/express": "5.0.1",
+    "@types/uuid": "10.0.0",
+    "axios": "1.13.2",
+    "pg": "8.17.2"
+  },
+  "dependencies": {
+    "@nestjs-modules/ioredis": "^2.0.2",
+    "@oxc-project/runtime": "^0.114.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
+    "@eslint/js": "^10.0.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "~25.3.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "dotenv": "^17.3.1",
+    "eslint": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "git-cz": "^4.9.0",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "jest-environment-node": "^30.2.0",
+    "lint-staged": "^16.2.7",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.1",
+    "prisma": "^7.4.1",
+    "rolldown": "^1.0.0-rc.5",
+    "ts-jest": "^29.4.6",
+    "ts-node": "10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "turbo": "^2.8.10",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.56.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "yarn": ">=1.22.0"
+  }
+}
