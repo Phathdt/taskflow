@@ -19,6 +19,7 @@ const config: Config = {
     '^@taskflow/custom-config$': '<rootDir>/../custom-config/src/index',
     '^@taskflow/custom-logger$': '<rootDir>/../custom-logger/src/index',
     '^@taskflow/database$': '<rootDir>/../database/src/index',
+    '^@taskflow/database/(.*)$': '<rootDir>/../database/src/$1',
     '^@taskflow/share$': '<rootDir>/../share/src/index',
     '^@taskflow/user$': '<rootDir>/../user/src/index',
   },

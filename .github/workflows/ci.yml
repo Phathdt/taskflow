@@ -55,7 +55,7 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
-      - name: Test
+      - name: Unit Tests
         run: yarn test:ci
 
       - name: Build

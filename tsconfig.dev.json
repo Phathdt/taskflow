@@ -5,6 +5,7 @@
       "@taskflow/custom-config": ["libs/custom-config/src/index"],
       "@taskflow/custom-logger": ["libs/custom-logger/src/index"],
       "@taskflow/database": ["libs/database/src/index"],
+      "@taskflow/database/*": ["libs/database/src/*"],
       "@taskflow/share": ["libs/share/src/index"],
       "@taskflow/auth": ["libs/auth/src/index"],
       "@taskflow/user": ["libs/user/src/index"],

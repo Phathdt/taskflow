@@ -165,8 +165,10 @@ yarn db:seed          # Seed admin user
 yarn lint             # ESLint with auto-fix
 yarn format           # Prettier formatting
 yarn typecheck        # TypeScript type checking
-yarn test             # Run all tests
-yarn test:ci          # Run tests with coverage
+yarn test             # Run all tests (unit + integration)
+yarn test:unit        # Run unit tests only
+yarn test:integration # Run integration tests only (requires Docker)
+yarn test:ci          # Run unit tests with coverage (used in CI)
 ```
 
 ### Utility Commands
@@ -177,6 +179,29 @@ yarn check:unused     # Detect unused exports
 yarn sync:deps        # Sync workspace dependencies
 yarn clean            # Remove dist, .turbo, node_modules
 ```
+
+## Testing
+
+### Unit Tests
+
+Unit tests mock external dependencies and run without infrastructure:
+
+```bash
+yarn test:unit
+```
+
+### Integration Tests
+
+Integration tests use [Testcontainers](https://testcontainers.com) to spin up real PostgreSQL and Redis instances in Docker. **Docker must be running.**
+
+```bash
+yarn test:integration
+```
+
+Covers:
+- `UserPrismaRepository` — CRUD, pagination, unique constraints against real PostgreSQL
+- `TaskPrismaRepository` — CRUD, filters, assignment against real PostgreSQL
+- `SessionRedisRepository` — save/get, TTL expiration, bulk removal against real Redis
 
 ## Docker Support
 
