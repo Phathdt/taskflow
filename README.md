@@ -100,21 +100,31 @@ cp config/config.yml.example config/config.yml
 cp .env.example .env
 ```
 
-Edit `config/config.yml` with your settings:
+Edit `config/config.yml` with your settings (ports must match docker-compose):
 
 ```yaml
 host:
   port: 3000
 database:
-  url: postgresql://postgres:postgres@localhost:15432/taskflow?schema=public
+  url: postgresql://postgres:123123123@localhost:5432/taskflow?schema=public
 redis:
-  url: redis://localhost:16379
+  url: redis://localhost:6379
 jwt:
   secret: your-secret-key
   expires_in: 30d
 auth:
   bcrypt_rounds: 10
   session_ttl_seconds: 2592000
+log:
+  level: debug
+  enable_json_format: false
+```
+
+Edit `.env` to override config values via environment (optional):
+
+```bash
+DATABASE__URL=postgresql://postgres:123123123@localhost:5432/taskflow
+REDIS__URL=redis://127.0.0.1:6379
 ```
 
 3. **Start Infrastructure**

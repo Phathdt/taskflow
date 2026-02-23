@@ -4,11 +4,11 @@ host:
 
 # Database configuration
 database:
-  url: postgresql://postgres:postgres@localhost:15432/taskflow?schema=public
+  url: postgresql://postgres:123123123@localhost:5432/taskflow?schema=public
 
 # Redis configuration
 redis:
-  url: redis://localhost:16379
+  url: redis://localhost:6379
 
 # Auth configuration
 auth:
