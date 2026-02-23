@@ -14,6 +14,8 @@
   "dependencies": {
     "@taskflow/auth": "*",
     "@taskflow/custom-config": "*",
+    "@taskflow/task": "*",
+    "@taskflow/user": "*",
     "@taskflow/custom-logger": "*",
     "@taskflow/share": "*",
     "@keyv/redis": "^5.1.6",

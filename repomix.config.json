@@ -14,16 +14,7 @@
   "ignore": {
     "useGitignore": true,
     "useDefaultPatterns": true,
-    "customPatterns": [
-      "**/*.log",
-      ".github",
-      "abi",
-      "prisma/migrations",
-      "schema.gen.sql",
-      "**/*.md",
-      "**/mock",
-      "**/__tests__"
-    ]
+    "customPatterns": ["**/*.log", ".github", "abi", "prisma/migrations", "**/*.md", "**/mock", "**/__tests__"]
   },
   "security": {
     "enableSecurityCheck": true

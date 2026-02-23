@@ -5,13 +5,15 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
 import { AuthModule } from '@taskflow/auth'
 import { CustomConfigModule, CustomConfigService } from '@taskflow/custom-config'
 import { CustomLoggerModule } from '@taskflow/custom-logger'
+import { TaskModule } from '@taskflow/task'
+import { UserModule } from '@taskflow/user'
 
 import { LoggerErrorInterceptor } from 'nestjs-pino'
 import { ZodValidationPipe } from 'nestjs-zod'
 
 import { AppController } from './app.controller'
 
-import { AuthController } from '../controllers'
+import { AuthController, TaskController, UserController } from '../controllers'
 import {
   ResponseExceptionFilter,
   ResponseInterceptor,
@@ -33,8 +35,10 @@ import {
       inject: [CustomConfigService],
     }),
     AuthModule,
+    UserModule,
+    TaskModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, UserController, TaskController],
   providers: [
     // Global interceptors (order matters: LoggerError -> TraceId -> Response)
     { provide: APP_INTERCEPTOR, useClass: LoggerErrorInterceptor },

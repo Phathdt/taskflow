@@ -42,7 +42,7 @@
     "@bull-board/express/express": "5.0.1",
     "@types/uuid": "10.0.0",
     "axios": "1.13.2",
-    "pg": "8.17.2"
+    "pg": "8.18.0"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.0.2",

@@ -3,6 +3,7 @@ import { ConflictException, NotFoundException, UnauthorizedException } from '@ne
 import * as bcrypt from 'bcryptjs'
 
 import { AuthService } from './auth.service'
+
 import { type IJwtTokenService, type ISessionStoreService } from '../../domain'
 
 jest.mock('bcryptjs')

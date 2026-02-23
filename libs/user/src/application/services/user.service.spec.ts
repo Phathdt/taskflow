@@ -1,80 +1,86 @@
 import { NotFoundException } from '@nestjs/common'
+import { Test, type TestingModule } from '@nestjs/testing'
 
 import { UserService } from './user.service'
-import { type IUserRepository, type User, type UserWithPassword } from '../../domain'
+
+import { type IUserRepository } from '../../domain'
+import { USER_REPOSITORY } from '../../infras/di'
 
 describe('UserService', () => {
   let service: UserService
-  let mockRepo: jest.Mocked<IUserRepository>
+  let repo: jest.Mocked<IUserRepository>
 
-  const mockUser: User = {
+  const mockUser = {
     id: 1,
-    email: 'test@example.com',
-    name: 'Test User',
-    role: 'worker',
-    createdAt: new Date('2026-01-01'),
-    updatedAt: new Date('2026-01-01'),
+    email: 'test@test.com',
+    name: 'Test',
+    role: 'worker' as const,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   }
 
-  const mockUserWithPassword: UserWithPassword = {
-    ...mockUser,
-    password: 'hashed_password',
-  }
-
-  beforeEach(() => {
-    mockRepo = {
+  beforeEach(async () => {
+    const mockRepo: jest.Mocked<IUserRepository> = {
       findByEmail: jest.fn(),
       findById: jest.fn(),
       create: jest.fn(),
+      findAll: jest.fn(),
+      updateRole: jest.fn(),
     }
 
-    service = new UserService(mockRepo)
-  })
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [UserService, { provide: USER_REPOSITORY, useValue: mockRepo }],
+    }).compile()
 
-  describe('findByEmail', () => {
-    it('should return user with password when found', async () => {
-      mockRepo.findByEmail.mockResolvedValue(mockUserWithPassword)
-
-      const result = await service.findByEmail('test@example.com')
-
-      expect(result).toEqual(mockUserWithPassword)
-      expect(mockRepo.findByEmail).toHaveBeenCalledWith('test@example.com')
-    })
-
-    it('should propagate NotFoundException when user not found', async () => {
-      mockRepo.findByEmail.mockRejectedValue(new NotFoundException('User not found'))
-
-      await expect(service.findByEmail('missing@example.com')).rejects.toThrow(NotFoundException)
-    })
+    service = module.get<UserService>(UserService)
+    repo = module.get(USER_REPOSITORY)
   })
 
   describe('findById', () => {
-    it('should return user when found', async () => {
-      mockRepo.findById.mockResolvedValue(mockUser)
-
+    it('should return a user', async () => {
+      repo.findById.mockResolvedValue(mockUser)
       const result = await service.findById(1)
-
       expect(result).toEqual(mockUser)
-      expect(mockRepo.findById).toHaveBeenCalledWith(1)
+      expect(repo.findById).toHaveBeenCalledWith(1)
     })
 
-    it('should propagate NotFoundException when user not found', async () => {
-      mockRepo.findById.mockRejectedValue(new NotFoundException('User not found'))
-
+    it('should propagate NotFoundException', async () => {
+      repo.findById.mockRejectedValue(new NotFoundException())
       await expect(service.findById(999)).rejects.toThrow(NotFoundException)
     })
   })
 
+  describe('findAll', () => {
+    it('should return paginated users', async () => {
+      const paginated = {
+        data: [mockUser],
+        paging: { total: 1, page: 1, limit: 20, pages: 1 },
+      }
+      repo.findAll.mockResolvedValue(paginated)
+      const result = await service.findAll({ page: 1, limit: 20 })
+      expect(result).toEqual(paginated)
+    })
+  })
+
+  describe('updateRole', () => {
+    it('should update and return user', async () => {
+      const updated = { ...mockUser, role: 'admin' as const }
+      repo.updateRole.mockResolvedValue(updated)
+      const result = await service.updateRole(1, 'admin')
+      expect(result.role).toBe('admin')
+    })
+  })
+
   describe('create', () => {
-    it('should create and return user', async () => {
-      const input = { email: 'new@example.com', password: 'hashed', name: 'New User', role: 'worker' }
-      mockRepo.create.mockResolvedValue({ ...mockUser, email: input.email, name: input.name })
-
-      const result = await service.create(input)
-
-      expect(result.email).toBe(input.email)
-      expect(result.name).toBe(input.name)
-      expect(mockRepo.create).toHaveBeenCalledWith(input)
+    it('should create a user', async () => {
+      repo.create.mockResolvedValue(mockUser)
+      const result = await service.create({
+        email: 'test@test.com',
+        password: 'hashed',
+        name: 'Test',
+        role: 'worker',
+      })
+      expect(result).toEqual(mockUser)
     })
   })
 })

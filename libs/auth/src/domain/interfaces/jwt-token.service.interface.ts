@@ -1,8 +1,10 @@
+import { type RoleType } from '@taskflow/user'
+
 export interface JwtPayload {
   userId: number
   email: string
   name: string
-  role: string
+  role: RoleType
   subToken: string
   iat: number
   exp: number

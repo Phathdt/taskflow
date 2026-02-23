@@ -21,6 +21,7 @@ const config: Config = {
     '^@taskflow/database$': '<rootDir>/../database/src/index',
     '^@taskflow/share$': '<rootDir>/../share/src/index',
   },
+  transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.spec.ts', '!src/index.ts'],
   coverageDirectory: '../../coverage/libs/user',
 }

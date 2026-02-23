@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common'
 import { type JwtService } from '@nestjs/jwt'
 
 import { JwtTokenService } from './jwt-token.service'
+
 import { type JwtPayload } from '../../domain'
 
 describe('JwtTokenService', () => {

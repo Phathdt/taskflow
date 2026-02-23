@@ -45,12 +45,35 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 
 ## API Endpoints
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/auth/register` | Public | Register a new user |
-| `POST` | `/auth/login` | Public | Login and receive JWT |
-| `POST` | `/auth/logout` | Required | Invalidate current session |
-| `GET` | `/auth/me` | Required | Get current user profile |
+### Authentication
+
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| `POST` | `/auth/register` | Public | - | Register a new user (default: worker) |
+| `POST` | `/auth/login` | Public | - | Login and receive JWT |
+| `POST` | `/auth/logout` | Required | Any | Invalidate all sessions |
+| `GET` | `/auth/me` | Required | Any | Get current user profile |
+
+### User Management
+
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| `GET` | `/users` | Required | Admin | List all users (paginated) |
+| `GET` | `/users/:id` | Required | Any* | Get user by ID |
+| `PATCH` | `/users/:id/role` | Required | Admin | Change user role |
+
+### Task Management
+
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| `POST` | `/tasks` | Required | Admin | Create a task |
+| `GET` | `/tasks` | Required | Any* | List tasks (filtered by role) |
+| `GET` | `/tasks/:id` | Required | Any* | Get task by ID |
+| `PATCH` | `/tasks/:id` | Required | Any* | Update task |
+| `DELETE` | `/tasks/:id` | Required | Admin | Delete task |
+| `PATCH` | `/tasks/:id/assign` | Required | Admin | Assign task to user |
+
+*Any\* = Admin sees all; Worker sees only own/assigned resources.*
 
 ## Prerequisites
 

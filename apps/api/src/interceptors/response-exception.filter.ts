@@ -3,44 +3,70 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { Response } from 'express'
 import { v7 as uuidv7 } from 'uuid'
 
+interface TraceableRequest {
+  traceId?: string
+}
+
+const httpStatusToCode: Record<number, string> = {
+  400: 'BAD_REQUEST',
+  401: 'UNAUTHORIZED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  409: 'CONFLICT',
+  422: 'UNPROCESSABLE_ENTITY',
+  429: 'TOO_MANY_REQUESTS',
+  500: 'INTERNAL_SERVER_ERROR',
+}
+
 @Catch()
 export class ResponseExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
-    const request = ctx.getRequest<Request>()
-
-    const traceId = (request as Request & { traceId?: string }).traceId || uuidv7()
+    const request = ctx.getRequest<TraceableRequest>()
+    const traceId = request.traceId || uuidv7()
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR
     let message = 'Internal server error'
-    let error = 'Unknown error'
+    let code = 'INTERNAL_SERVER_ERROR'
 
     if (exception instanceof HttpException) {
       status = exception.getStatus()
-      const responseBody = exception.getResponse() as
-        | { error?: string; message?: string | string[]; statusCode?: number }
-        | string
+      code = httpStatusToCode[status] || 'UNKNOWN_ERROR'
+      const body = exception.getResponse() as string | { message?: string | string[] }
 
-      if (typeof responseBody === 'object' && responseBody !== null) {
-        error = responseBody.error || exception.message || 'Error'
-        message = Array.isArray(responseBody.message)
-          ? responseBody.message.join(', ')
-          : responseBody.message || 'An error occurred'
+      if (typeof body === 'string') {
+        message = body
+      } else if (body && typeof body.message === 'string') {
+        message = body.message
+      } else if (body && Array.isArray(body.message)) {
+        message = body.message.join(', ')
       } else {
-        error = exception.message
-        message = responseBody || 'An error occurred'
+        message = exception.message
       }
+    } else if (this._isPrismaNotFound(exception)) {
+      status = HttpStatus.NOT_FOUND
+      code = 'NOT_FOUND'
+      message = 'Resource not found'
+    } else if (this._isPrismaUniqueConstraint(exception)) {
+      status = HttpStatus.CONFLICT
+      code = 'CONFLICT'
+      message = 'Resource already exists'
     } else if (exception instanceof Error) {
-      error = exception.message
-      message = exception.name
+      message = exception.message
     }
 
     response.status(status).header('X-Trace-Id', traceId).json({
-      statusCode: status,
-      message: message,
-      error: error,
-      traceId: traceId,
+      error: { code, message },
+      traceId,
     })
+  }
+
+  private _isPrismaNotFound(err: unknown): boolean {
+    return (err as { code?: string })?.code === 'P2025'
+  }
+
+  private _isPrismaUniqueConstraint(err: unknown): boolean {
+    return (err as { code?: string })?.code === 'P2002'
   }
 }
