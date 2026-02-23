@@ -29,7 +29,6 @@ export interface ITaskRepository {
   create(data: CreateTaskInput): Promise<Task>
   findById(id: number): Promise<Task>
   findAll(params: TaskFilterParams): Promise<Paginated<Task>>
-  findAllByAssignee(assigneeId: number, params: PaginationRequest): Promise<Paginated<Task>>
   update(id: number, data: UpdateTaskInput): Promise<Task>
   delete(id: number): Promise<void>
   assign(id: number, assigneeId: number): Promise<Task>

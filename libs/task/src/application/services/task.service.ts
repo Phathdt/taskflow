@@ -1,5 +1,5 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common'
-import { type Paginated, type PaginationRequest } from '@taskflow/share'
+import { type Paginated } from '@taskflow/share'
 import { Role, USER_SERVICE, type IUserService, type RoleType } from '@taskflow/user'
 
 import {
@@ -38,7 +38,7 @@ export class TaskService implements ITaskService {
     if (userRole === Role.ADMIN) {
       return this.taskRepo.findAll(params)
     }
-    return this.taskRepo.findAllByAssignee(userId, params as PaginationRequest)
+    return this.taskRepo.findAll({ ...params, assigneeId: userId })
   }
 
   async update(id: number, data: UpdateTaskInput, userId: number, userRole: RoleType): Promise<Task> {

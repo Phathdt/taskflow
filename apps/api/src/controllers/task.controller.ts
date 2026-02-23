@@ -40,14 +40,7 @@ export class TaskController {
   @HttpCode(HttpStatus.CREATED)
   @UseResponseSchema('Create task', 'Creates a new task', TaskResponseSchema, { status: HttpStatus.CREATED })
   async create(@TransformedBody() dto: CreateTaskDto, @CurrentUser() user: JwtPayload) {
-    return this.taskService.create({
-      title: dto.title,
-      description: dto.description ?? null,
-      priority: dto.priority ?? 'medium',
-      dueDate: dto.dueDate ?? null,
-      createdById: user.userId,
-      assigneeId: dto.assigneeId ?? null,
-    })
+    return this.taskService.create({ ...dto, createdById: user.userId })
   }
 
   @Get()

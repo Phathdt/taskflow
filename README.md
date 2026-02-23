@@ -60,7 +60,7 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 | Method | Path | Auth | Role | Description |
 |--------|------|------|------|-------------|
 | `GET` | `/users` | Required | Admin | List all users (paginated) |
-| `GET` | `/users/:id` | Required | Any* | Get user by ID |
+| `GET` | `/users/:id` | Required | Admin | Get user by ID |
 | `PATCH` | `/users/:id/role` | Required | Admin | Change user role |
 
 ### Task Management

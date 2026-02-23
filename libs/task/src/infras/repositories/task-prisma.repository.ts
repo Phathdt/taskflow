@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { DatabaseService, Task as TaskPrisma } from '@taskflow/database'
-import { createPaginationResponse, type Paginated, type PaginationRequest } from '@taskflow/share'
+import { createPaginationResponse, type Paginated } from '@taskflow/share'
 
 import {
   type CreateTaskInput,
@@ -35,22 +35,6 @@ export class TaskPrismaRepository implements ITaskRepository {
       ...(priority && { priority }),
       ...(assigneeId && { assigneeId }),
     }
-
-    const [tasks, total] = await Promise.all([
-      this.db.task.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
-      this.db.task.count({ where }),
-    ])
-
-    return {
-      data: tasks.map((t) => this._toTask(t)),
-      paging: createPaginationResponse(total, page, limit),
-    }
-  }
-
-  async findAllByAssignee(assigneeId: number, params: PaginationRequest): Promise<Paginated<Task>> {
-    const { page, limit } = params
-    const skip = (page - 1) * limit
-    const where = { assigneeId }
 
     const [tasks, total] = await Promise.all([
       this.db.task.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),

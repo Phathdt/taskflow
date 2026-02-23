@@ -40,7 +40,6 @@ describe('TaskService', () => {
       create: jest.fn(),
       findById: jest.fn(),
       findAll: jest.fn(),
-      findAllByAssignee: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
       assign: jest.fn(),
@@ -121,9 +120,9 @@ describe('TaskService', () => {
         data: [mockTask],
         paging: { total: 1, page: 1, limit: 20, pages: 1 },
       }
-      taskRepo.findAllByAssignee.mockResolvedValue(paginated)
+      taskRepo.findAll.mockResolvedValue(paginated)
       const result = await service.findAll(2, 'worker', { page: 1, limit: 20 })
-      expect(taskRepo.findAllByAssignee).toHaveBeenCalledWith(2, { page: 1, limit: 20 })
+      expect(taskRepo.findAll).toHaveBeenCalledWith({ page: 1, limit: 20, assigneeId: 2 })
       expect(result).toEqual(paginated)
     })
   })

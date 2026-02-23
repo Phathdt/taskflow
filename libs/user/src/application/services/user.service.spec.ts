@@ -66,8 +66,13 @@ describe('UserService', () => {
     it('should update and return user', async () => {
       const updated = { ...mockUser, role: 'admin' as const }
       repo.updateRole.mockResolvedValue(updated)
-      const result = await service.updateRole(1, 'admin')
+      const result = await service.updateRole(1, 'admin', 99) // requesterId = 99 (different user)
       expect(result.role).toBe('admin')
+    })
+
+    it('should throw ForbiddenException when changing own role', async () => {
+      const { ForbiddenException } = await import('@nestjs/common')
+      await expect(service.updateRole(1, 'admin', 1)).rejects.toThrow(ForbiddenException)
     })
   })
 

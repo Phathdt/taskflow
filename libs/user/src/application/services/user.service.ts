@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common'
 import { type Paginated, type PaginationRequest } from '@taskflow/share'
 
 import { type IUserRepository, type IUserService, type RoleType, type User, type UserWithPassword } from '../../domain'
@@ -24,7 +24,10 @@ export class UserService implements IUserService {
     return this.userRepo.findAll(query)
   }
 
-  async updateRole(id: number, role: RoleType): Promise<User> {
+  async updateRole(id: number, role: RoleType, requesterId: number): Promise<User> {
+    if (requesterId === id) {
+      throw new ForbiddenException('Cannot change your own role')
+    }
     return this.userRepo.updateRole(id, role)
   }
 }

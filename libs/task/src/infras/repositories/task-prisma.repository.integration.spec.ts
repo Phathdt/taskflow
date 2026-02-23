@@ -137,18 +137,6 @@ describe('TaskPrismaRepository (integration)', () => {
     })
   })
 
-  describe('findAllByAssignee', () => {
-    it('should return only tasks assigned to the given user', async () => {
-      await repo.create({ title: 'Unassigned', priority: 'medium', createdById: seedUserId })
-      await repo.create({ title: 'Assigned 1', priority: 'medium', createdById: seedUserId, assigneeId: seedUserId })
-      await repo.create({ title: 'Assigned 2', priority: 'low', createdById: seedUserId, assigneeId: seedUserId })
-
-      const result = await repo.findAllByAssignee(seedUserId, { page: 1, limit: 10 })
-      expect(result.data).toHaveLength(2)
-      expect(result.paging.total).toBe(2)
-    })
-  })
-
   describe('update', () => {
     it('should update task fields', async () => {
       const created = await repo.create({

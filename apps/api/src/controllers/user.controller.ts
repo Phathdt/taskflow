@@ -1,6 +1,5 @@
 import {
   Controller,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -40,12 +39,10 @@ export class UserController {
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   @UseResponseSchema('Get user', 'Returns a single user by ID', UserResponseSchema)
-  async getById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
-    if (user.role !== Role.ADMIN && user.userId !== id) {
-      throw new ForbiddenException('You can only view your own profile')
-    }
+  async getById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findById(id)
   }
 
@@ -58,9 +55,6 @@ export class UserController {
     @TransformedBody() dto: ChangeRoleDto,
     @CurrentUser() user: JwtPayload
   ) {
-    if (user.userId === id) {
-      throw new ForbiddenException('Cannot change your own role')
-    }
-    return this.userService.updateRole(id, dto.role)
+    return this.userService.updateRole(id, dto.role, user.userId)
   }
 }

@@ -167,22 +167,12 @@ else
   fail "Get user by ID admin (HTTP ${CODE})" "$BODY"
 fi
 
-# 2.4 Get self as worker
-info "GET /users/${WORKER_ID} as worker (self)..."
+# 2.4 Get user as worker (expect 403 - admin only)
+info "GET /users/${WORKER_ID} as worker (expect 403)..."
 RESP=$(request GET "/users/${WORKER_ID}" "$WORKER_TOKEN")
-CODE=$(parse_code "$RESP"); BODY=$(parse_body "$RESP")
-if [ "$CODE" = "200" ]; then
-  pass "Get self as worker (HTTP ${CODE})"
-else
-  fail "Get self as worker (HTTP ${CODE})" "$BODY"
-fi
-
-# 2.5 Get other user as worker (expect 403)
-info "GET /users/${ADMIN_ID} as worker (expect 403)..."
-RESP=$(request GET "/users/${ADMIN_ID}" "$WORKER_TOKEN")
 CODE=$(parse_code "$RESP")
 if [ "$CODE" = "403" ]; then
-  pass "Get other user forbidden for worker (HTTP ${CODE})"
+  pass "Get user forbidden for worker (HTTP ${CODE})"
 else
   BODY=$(parse_body "$RESP")
   fail "Expected 403, got ${CODE}" "$BODY"
