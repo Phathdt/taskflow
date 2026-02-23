@@ -42,6 +42,7 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 - **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
 - **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
+- **API Docs**: Swagger UI at `/swagger` (OpenAPI 3.0, auto-generated from Zod schemas)
 
 ## API Endpoints
 
@@ -135,6 +136,8 @@ yarn db:seed        # Seed admin user (admin@taskflow.local / admin123)
 ```bash
 yarn dev            # Start API in development mode
 ```
+
+API available at `http://localhost:3000`. Swagger docs at `http://localhost:3000/swagger`.
 
 ## Development Commands
 

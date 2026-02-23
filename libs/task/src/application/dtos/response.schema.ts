@@ -2,8 +2,7 @@ import { PaginationResponseSchema } from '@taskflow/share'
 
 import { z } from 'zod'
 
-import { PrioritySchema } from '../../domain/entities/priority.enum'
-import { TaskStatusSchema } from '../../domain/entities/task-status.enum'
+import { PrioritySchema, TaskStatusSchema } from '../../domain'
 
 // Swagger-safe task schema (z.string for dates since z.date can't serialize to JSON Schema)
 export const TaskResponseSchema = z.object({

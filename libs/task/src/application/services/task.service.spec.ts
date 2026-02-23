@@ -5,7 +5,7 @@ import { Test, type TestingModule } from '@nestjs/testing'
 import { TaskService } from './task.service'
 
 import { type ITaskRepository } from '../../domain'
-import { TASK_REPOSITORY } from '../../infras/di'
+import { TASK_REPOSITORY } from '../../infras'
 
 // Mock @taskflow/user to avoid ESM uuid chain (user.module → database → custom-logger → uuid)
 // Use Symbol.for so it's globally shared between the mock and NestJS DI container

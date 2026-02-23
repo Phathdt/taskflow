@@ -13,7 +13,7 @@ import {
   type LoginResult,
   type RegisterInput,
 } from '../../domain'
-import { JWT_TOKEN_SERVICE, SESSION_STORE_SERVICE } from '../../infras/di'
+import { JWT_TOKEN_SERVICE, SESSION_STORE_SERVICE } from '../../infras'
 
 @Injectable()
 export class AuthService implements IAuthService {

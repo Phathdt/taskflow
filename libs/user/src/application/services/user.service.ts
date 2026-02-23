@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { type Paginated, type PaginationRequest } from '@taskflow/share'
 
 import { type IUserRepository, type IUserService, type RoleType, type User, type UserWithPassword } from '../../domain'
-import { USER_REPOSITORY } from '../../infras/di'
+import { USER_REPOSITORY } from '../../infras'
 
 @Injectable()
 export class UserService implements IUserService {

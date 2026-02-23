@@ -10,7 +10,7 @@ import {
   type TaskFilterParams,
   type UpdateTaskInput,
 } from '../../domain'
-import { TASK_REPOSITORY } from '../../infras/di'
+import { TASK_REPOSITORY } from '../../infras'
 
 @Injectable()
 export class TaskService implements ITaskService {

@@ -1,8 +1,6 @@
 import { type Paginated, type PaginationRequest } from '@taskflow/share'
 
-import { type PriorityType } from '../entities/priority.enum'
-import { type TaskStatusType } from '../entities/task-status.enum'
-import { type Task } from '../entities/task.entity'
+import { type PriorityType, type Task, type TaskStatusType } from '../entities'
 
 export interface TaskFilterParams extends PaginationRequest {
   status?: TaskStatusType

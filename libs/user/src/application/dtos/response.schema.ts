@@ -2,7 +2,7 @@ import { PaginationResponseSchema } from '@taskflow/share'
 
 import { z } from 'zod'
 
-import { RoleSchema } from '../../domain/entities/role.enum'
+import { RoleSchema } from '../../domain'
 
 // Swagger-safe user schema (z.string for dates since z.date can't serialize to JSON Schema)
 export const UserResponseSchema = z.object({

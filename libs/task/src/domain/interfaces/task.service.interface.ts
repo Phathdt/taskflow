@@ -3,7 +3,7 @@ import { type RoleType } from '@taskflow/user'
 
 import { type CreateTaskInput, type TaskFilterParams, type UpdateTaskInput } from './task.repository.interface'
 
-import { type Task } from '../entities/task.entity'
+import { type Task } from '../entities'
 
 export interface ITaskService {
   create(data: CreateTaskInput): Promise<Task>

@@ -1,8 +1,7 @@
 import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
 
-import { PrioritySchema } from '../../domain/entities/priority.enum'
-import { TaskStatusSchema } from '../../domain/entities/task-status.enum'
+import { PrioritySchema, TaskStatusSchema } from '../../domain'
 
 export const UpdateTaskSchema = z.object({
   title: z.string().min(1).max(255).optional(),
