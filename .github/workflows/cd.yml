@@ -20,10 +20,16 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      short_sha: ${{ steps.vars.outputs.short_sha }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set short SHA
+        id: vars
+        run: echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -38,8 +44,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=
-            type=raw,value=latest
+            type=sha,prefix=,format=short
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,3 +59,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  update-gitops:
+    name: Update GitOps Image Tag
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gitops repo
+        uses: actions/checkout@v4
+        with:
+          repository: Phathdt/gitops-homelab
+          ssh-key: ${{ secrets.GITOPS_DEPLOY_KEY }}
+
+      - name: Update image tag
+        run: |
+          SHORT_SHA=${{ needs.build-and-push.outputs.short_sha }}
+          sed -i "s|tag: \".*\"|tag: \"${SHORT_SHA}\"|" apps/taskflow-api/values.yaml
+          cat apps/taskflow-api/values.yaml | head -10
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add apps/taskflow-api/values.yaml
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "chore: update taskflow-api image to ${{ needs.build-and-push.outputs.short_sha }}"
+          git push

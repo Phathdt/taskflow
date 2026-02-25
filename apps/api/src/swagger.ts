@@ -1,5 +1,6 @@
 import { type INestApplication } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { apiReference } from '@scalar/nestjs-api-reference'
 
 export const setUpSwagger = (app: INestApplication, baseUrl: string) => {
   const config = new DocumentBuilder()
@@ -15,4 +16,12 @@ export const setUpSwagger = (app: INestApplication, baseUrl: string) => {
     jsonDocumentUrl: 'swagger/json',
     swaggerOptions: { persistAuthorization: true },
   })
+
+  app.use(
+    '/reference',
+    apiReference({
+      spec: { content: document },
+      theme: 'kepler',
+    })
+  )
 }

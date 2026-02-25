@@ -32,6 +32,7 @@ async function bootstrap() {
   await app.listen(port, () => {
     Logger.log(`App running on ${baseUrl}`)
     Logger.log(`Swagger docs at ${baseUrl}/swagger`)
+    Logger.log(`Scalar API reference at ${baseUrl}/reference`)
   })
 }
 
