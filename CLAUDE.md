@@ -49,6 +49,8 @@ yarn lint               # ESLint with auto-fix
 yarn format             # Prettier formatting
 yarn test               # Run Jest tests
 yarn typecheck          # TypeScript type checking
+yarn sync:deps:strict   # Sync and validate workspace dependencies (strict mode)
+yarn check:unused:ci    # Check for unused dependencies (CI mode, fails on findings)
 ```
 
 ### Turborepo Commands
@@ -103,7 +105,9 @@ After making code changes:
 2. `yarn lint` - Fix linting issues (no `any` types allowed)
 3. `yarn format` - Apply formatting
 4. `yarn test` - Ensure tests pass
-5. `yarn db:generate` - If schema modified
+5. `yarn sync:deps:strict` - Validate workspace dependencies are in sync
+6. `yarn check:unused:ci` - Ensure no unused dependencies introduced
+7. `yarn db:generate` - If schema modified
 
 ### Type Safety Guidelines
 
