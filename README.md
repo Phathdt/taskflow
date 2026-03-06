@@ -10,10 +10,18 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 .
 ├── apps/
 │   └── api/                    # Main NestJS API service
+│       └── src/
+│           ├── controllers/    # HTTP route handlers
+│           ├── guards/         # Auth and role guards
+│           ├── interceptors/   # Response formatting, trace ID
+│           ├── middlewares/    # Basic auth middleware
+│           ├── processors/     # BullMQ job processors
+│           └── schedulers/     # BullMQ schedulers
 ├── libs/
 │   ├── auth/                   # Authentication (JWT, sessions, guards)
 │   ├── user/                   # User domain (entities, repository, service)
 │   ├── task/                   # Task domain (entities, repository, service)
+│   ├── notification/           # Notification library (in progress)
 │   ├── custom-config/          # YAML-based configuration with env override
 │   ├── custom-logger/          # Pino-based structured logging
 │   ├── database/               # Prisma ORM and PostgreSQL
@@ -30,6 +38,7 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 | `@taskflow/auth` | JWT authentication, bcrypt password hashing, Redis session whitelist, login/register/logout |
 | `@taskflow/user` | User entity, roles (admin/worker), Prisma repository |
 | `@taskflow/task` | Task entity, status (pending/in_progress/completed/cancelled), priority (low/medium/high/urgent) |
+| `@taskflow/notification` | Notification library (in progress) |
 | `@taskflow/custom-config` | YAML config loading (`config/config.yml`) with typed interfaces |
 | `@taskflow/custom-logger` | Pino-based logger with JSON format support |
 | `@taskflow/database` | Prisma client and database module |
@@ -40,9 +49,10 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 - **Framework**: NestJS with decorators and dependency injection
 - **Database**: PostgreSQL with Prisma ORM
 - **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
+- **Queue**: BullMQ for background job processing and scheduling
 - **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
-- **API Docs**: Swagger UI at `/swagger` (OpenAPI 3.0, auto-generated from Zod schemas)
+- **API Docs**: Swagger UI at `/swagger`, Scalar reference at `/reference`
 
 ## API Endpoints
 

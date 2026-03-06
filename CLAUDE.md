@@ -11,17 +11,31 @@ This is a NestJS starter kit. It's built as a **Turborepo** monorepo with yarn w
 ### Monorepo Structure
 
 - `apps/api/` - Main NestJS API service
+  - `src/controllers/` - HTTP route handlers
+  - `src/guards/` - Auth and role guards
+  - `src/interceptors/` - Response formatting, trace ID
+  - `src/middlewares/` - Basic auth middleware
+  - `src/processors/` - BullMQ job processors (e.g. task-monitor)
+  - `src/schedulers/` - BullMQ schedulers (e.g. task-monitor)
 - `libs/` - Modular libraries organized by domain:
+  - `auth/` - JWT authentication, bcrypt, Redis session whitelist
+  - `user/` - User entity, roles (admin/worker), Prisma repository
+  - `task/` - Task entity, status, priority, Prisma repository
+  - `notification/` - Notification library (in progress)
   - `custom-config/` - YAML-based configuration with env override
   - `custom-logger/` - Pino-based structured logging
   - `database/` - Prisma ORM and PostgreSQL integration
-  - `share/` - Shared utilities and types
+  - `share/` - Shared utilities, decorators, and types
 
 ### Key Dependencies
 
 - **Framework**: NestJS with decorators and dependency injection
 - **Database**: PostgreSQL with Prisma ORM (generates types)
+- **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
+- **Queue**: BullMQ for background job processing and scheduling
+- **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
+- **API Docs**: Swagger UI at `/swagger`, Scalar reference at `/reference`
 
 ## Development Commands
 
