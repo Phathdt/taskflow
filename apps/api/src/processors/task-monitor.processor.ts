@@ -1,6 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq'
 import { EnhancedLogger } from '@taskflow/custom-logger'
 import { DatabaseService } from '@taskflow/database'
+import { QueueName } from '@taskflow/share'
 
 import { Job } from 'bullmq'
 
@@ -8,7 +9,7 @@ interface CheckProcessingTasksPayload {
   triggeredAt: string
 }
 
-@Processor('task-monitor')
+@Processor(QueueName.TaskMonitor)
 export class TaskMonitorProcessor extends WorkerHost {
   private readonly logger: EnhancedLogger
 
