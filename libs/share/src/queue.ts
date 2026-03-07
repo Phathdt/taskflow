@@ -1,15 +1,22 @@
 /**
- * Bull queue name constants
+ * Bull queue configuration constants
  *
- * Centralizes all queue names to avoid hardcoded strings across the codebase.
+ * Each queue entry exposes:
+ *  - NAME  — queue name string used in BullModule.registerQueue / @Processor / @InjectQueue
+ *  - JOBS  — job name strings used in queue.add() calls
+ *
+ * Derived helpers:
+ *  - QUEUE_NAMES — { name } array ready for BullModule.registerQueue(...QUEUE_NAMES)
  */
-export enum QueueName {
-  TaskMonitor = 'task-monitor',
-}
 
-/**
- * Bull job name constants for TaskMonitor queue
- */
-export enum TaskMonitorJob {
-  CheckProcessingTasks = 'check-processing-tasks',
-}
+export const TASK_MONITOR_QUEUE = {
+  MONITOR: {
+    NAME: 'task-monitor',
+    JOBS: {
+      CHECK_PROCESSING_TASKS: 'check-processing-tasks',
+    },
+  },
+} as const
+
+/** Spread into BullModule.registerQueue() */
+export const QUEUE_NAMES = Object.values(TASK_MONITOR_QUEUE).map(({ NAME }) => ({ name: NAME }))

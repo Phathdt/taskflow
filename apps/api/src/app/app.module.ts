@@ -8,7 +8,7 @@ import { AuthModule } from '@taskflow/auth'
 import { CustomConfigModule, CustomConfigService } from '@taskflow/custom-config'
 import { CustomLoggerModule } from '@taskflow/custom-logger'
 import { DatabaseModule } from '@taskflow/database'
-import { QueueName } from '@taskflow/share'
+import { QUEUE_NAMES } from '@taskflow/share'
 import { TaskModule } from '@taskflow/task'
 import { UserModule } from '@taskflow/user'
 
@@ -55,7 +55,7 @@ import { TaskMonitorScheduler } from '../schedulers'
       },
       inject: [CustomConfigService],
     }),
-    BullModule.registerQueue({ name: QueueName.TaskMonitor }),
+    BullModule.registerQueue(...QUEUE_NAMES),
     DatabaseModule,
     AuthModule,
     UserModule,
