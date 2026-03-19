@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import { type JwtService } from '@nestjs/jwt'
+import { AppUnauthorizedException } from '@taskflow/share'
 
 import { type IJwtTokenService, type JwtPayload } from '../../domain'
 
-@Injectable()
+// JwtService from @nestjs/jwt is passed via constructor (not injected).
+// For worker usage, provide a different IJwtTokenService implementation.
 export class JwtTokenService implements IJwtTokenService {
   constructor(private readonly jwtService: JwtService) {}
 
@@ -15,7 +16,7 @@ export class JwtTokenService implements IJwtTokenService {
     try {
       return this.jwtService.verify<JwtPayload>(token)
     } catch {
-      throw new UnauthorizedException('Invalid or expired token')
+      throw new AppUnauthorizedException('Invalid or expired token')
     }
   }
 

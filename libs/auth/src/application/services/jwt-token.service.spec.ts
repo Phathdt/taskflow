@@ -1,5 +1,5 @@
-import { UnauthorizedException } from '@nestjs/common'
 import { type JwtService } from '@nestjs/jwt'
+import { AppUnauthorizedException } from '@taskflow/share'
 
 import { JwtTokenService } from './jwt-token.service'
 
@@ -51,12 +51,12 @@ describe('JwtTokenService', () => {
       expect(mockJwtService.verify).toHaveBeenCalledWith('valid.jwt.token')
     })
 
-    it('should throw UnauthorizedException for invalid token', () => {
+    it('should throw AppUnauthorizedException for invalid token', () => {
       mockJwtService.verify.mockImplementation(() => {
         throw new Error('jwt expired')
       })
 
-      expect(() => service.verify('expired.jwt.token')).toThrow(UnauthorizedException)
+      expect(() => service.verify('expired.jwt.token')).toThrow(AppUnauthorizedException)
     })
   })
 

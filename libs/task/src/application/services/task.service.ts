@@ -1,6 +1,5 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common'
-import { type Paginated } from '@taskflow/share'
-import { Role, USER_SERVICE, type IUserService, type RoleType } from '@taskflow/user'
+import { AppForbiddenException, type Paginated } from '@taskflow/share'
+import { Role, type IUserService, type RoleType } from '@taskflow/user'
 
 import {
   type CreateTaskInput,
@@ -10,13 +9,11 @@ import {
   type TaskFilterParams,
   type UpdateTaskInput,
 } from '../../domain'
-import { TASK_REPOSITORY } from '../../infras'
 
-@Injectable()
 export class TaskService implements ITaskService {
   constructor(
-    @Inject(TASK_REPOSITORY) private readonly taskRepo: ITaskRepository,
-    @Inject(USER_SERVICE) private readonly userService: IUserService
+    private readonly taskRepo: ITaskRepository,
+    private readonly userService: IUserService
   ) {}
 
   async create(data: CreateTaskInput): Promise<Task> {
@@ -29,7 +26,7 @@ export class TaskService implements ITaskService {
   async findById(id: number, userId: number, userRole: RoleType): Promise<Task> {
     const task = await this.taskRepo.findById(id)
     if (userRole !== Role.ADMIN && task.assigneeId !== userId) {
-      throw new ForbiddenException('You can only view tasks assigned to you')
+      throw new AppForbiddenException('You can only view tasks assigned to you')
     }
     return task
   }
@@ -46,7 +43,7 @@ export class TaskService implements ITaskService {
 
     if (userRole !== Role.ADMIN) {
       if (task.assigneeId !== userId) {
-        throw new ForbiddenException('You can only update tasks assigned to you')
+        throw new AppForbiddenException('You can only update tasks assigned to you')
       }
       // Workers can only change status
       const workerUpdate: UpdateTaskInput = {}

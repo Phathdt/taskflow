@@ -1,6 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { DatabaseService, Task as TaskPrisma } from '@taskflow/database'
-import { createPaginationResponse, type Paginated } from '@taskflow/share'
+import { type DatabaseService, type Task as TaskPrisma } from '@taskflow/database'
+import { AppNotFoundException, createPaginationResponse, type Paginated } from '@taskflow/share'
 
 import {
   type CreateTaskInput,
@@ -12,7 +11,6 @@ import {
   type UpdateTaskInput,
 } from '../../domain'
 
-@Injectable()
 export class TaskPrismaRepository implements ITaskRepository {
   constructor(private readonly db: DatabaseService) {}
 
@@ -23,7 +21,7 @@ export class TaskPrismaRepository implements ITaskRepository {
 
   async findById(id: number): Promise<Task> {
     const task = await this.db.task.findFirst({ where: { id } })
-    if (!task) throw new NotFoundException(`Task with ID ${id} not found`)
+    if (!task) throw new AppNotFoundException(`Task with ID ${id} not found`)
     return this._toTask(task)
   }
 

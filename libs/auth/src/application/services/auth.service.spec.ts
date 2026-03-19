@@ -1,4 +1,4 @@
-import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import { AppConflictException, AppNotFoundException, AppUnauthorizedException } from '@taskflow/share'
 
 import * as bcrypt from 'bcryptjs'
 
@@ -9,6 +9,24 @@ import { type IJwtTokenService, type ISessionStoreService } from '../../domain'
 jest.mock('bcryptjs')
 jest.mock('@taskflow/share', () => ({
   generateToken: jest.fn(() => 'mock-sub-token'),
+  AppConflictException: class AppConflictException extends Error {
+    constructor(message = 'Conflict') {
+      super(message)
+      this.name = 'AppConflictException'
+    }
+  },
+  AppNotFoundException: class AppNotFoundException extends Error {
+    constructor(message = 'Not found') {
+      super(message)
+      this.name = 'AppNotFoundException'
+    }
+  },
+  AppUnauthorizedException: class AppUnauthorizedException extends Error {
+    constructor(message = 'Unauthorized') {
+      super(message)
+      this.name = 'AppUnauthorizedException'
+    }
+  },
 }))
 jest.mock('@taskflow/user', () => ({
   Role: { ADMIN: 'admin', WORKER: 'worker' },
@@ -40,7 +58,6 @@ describe('AuthService', () => {
   let mockUserService: jest.Mocked<IUserService>
   let mockJwtTokenService: jest.Mocked<IJwtTokenService>
   let mockSessionStore: jest.Mocked<ISessionStoreService>
-  let mockConfigService: { auth: { bcryptRounds: number; sessionTtlSeconds: number } }
 
   const mockUser: User = {
     id: 1,
@@ -75,21 +92,14 @@ describe('AuthService', () => {
       removeAllForUser: jest.fn(),
     }
 
-    mockConfigService = {
-      auth: { bcryptRounds: 10, sessionTtlSeconds: 3600 },
-    }
+    const config = { bcryptRounds: 10, sessionTtlSeconds: 3600 }
 
-    service = new AuthService(
-      mockUserService as never,
-      mockJwtTokenService,
-      mockSessionStore,
-      mockConfigService as never
-    )
+    service = new AuthService(mockUserService as never, mockJwtTokenService, mockSessionStore, config)
   })
 
   describe('register', () => {
     it('should register a new user successfully', async () => {
-      mockUserService.findByEmail.mockRejectedValue(new NotFoundException('Not found'))
+      mockUserService.findByEmail.mockRejectedValue(new AppNotFoundException('Not found'))
       ;(bcrypt.hash as jest.Mock).mockResolvedValue('hashed_password')
       mockUserService.create.mockResolvedValue(mockUser)
 
@@ -105,12 +115,12 @@ describe('AuthService', () => {
       })
     })
 
-    it('should throw ConflictException when email already exists', async () => {
+    it('should throw AppConflictException when email already exists', async () => {
       mockUserService.findByEmail.mockResolvedValue(mockUserWithPassword)
 
       await expect(
         service.register({ email: 'test@example.com', password: 'password123', name: 'Test User' })
-      ).rejects.toThrow(ConflictException)
+      ).rejects.toThrow(AppConflictException)
     })
 
     it('should rethrow unexpected errors from findByEmail', async () => {
@@ -143,20 +153,20 @@ describe('AuthService', () => {
       expect(mockSessionStore.save).toHaveBeenCalledWith(1, 'mock-sub-token', 'signature', 3600)
     })
 
-    it('should throw UnauthorizedException when user not found', async () => {
-      mockUserService.findByEmail.mockRejectedValue(new NotFoundException('Not found'))
+    it('should throw AppUnauthorizedException when user not found', async () => {
+      mockUserService.findByEmail.mockRejectedValue(new AppNotFoundException('Not found'))
 
       await expect(service.login({ email: 'missing@example.com', password: 'password123' })).rejects.toThrow(
-        UnauthorizedException
+        AppUnauthorizedException
       )
     })
 
-    it('should throw UnauthorizedException when password is invalid', async () => {
+    it('should throw AppUnauthorizedException when password is invalid', async () => {
       mockUserService.findByEmail.mockResolvedValue(mockUserWithPassword)
       ;(bcrypt.compare as jest.Mock).mockResolvedValue(false)
 
       await expect(service.login({ email: 'test@example.com', password: 'wrong' })).rejects.toThrow(
-        UnauthorizedException
+        AppUnauthorizedException
       )
     })
   })
@@ -181,10 +191,10 @@ describe('AuthService', () => {
       expect(mockUserService.findById).toHaveBeenCalledWith(1)
     })
 
-    it('should propagate NotFoundException when user not found', async () => {
-      mockUserService.findById.mockRejectedValue(new NotFoundException('Not found'))
+    it('should propagate AppNotFoundException when user not found', async () => {
+      mockUserService.findById.mockRejectedValue(new AppNotFoundException('Not found'))
 
-      await expect(service.me(999)).rejects.toThrow(NotFoundException)
+      await expect(service.me(999)).rejects.toThrow(AppNotFoundException)
     })
   })
 })

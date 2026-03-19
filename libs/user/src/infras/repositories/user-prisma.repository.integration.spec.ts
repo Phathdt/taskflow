@@ -1,4 +1,3 @@
-import { NotFoundException } from '@nestjs/common'
 import { type DatabaseService } from '@taskflow/database'
 import {
   setupPostgresContainer,
@@ -6,6 +5,7 @@ import {
   truncateAllTables,
   type PrismaTestContext,
 } from '@taskflow/database/__tests__/prisma-test-helper'
+import { AppNotFoundException } from '@taskflow/share'
 
 import { UserPrismaRepository } from './user-prisma.repository'
 
@@ -83,8 +83,8 @@ describe('UserPrismaRepository (integration)', () => {
       expect(found.role).toBe('admin')
     })
 
-    it('should throw NotFoundException for non-existent email', async () => {
-      await expect(repo.findByEmail('missing@example.com')).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException for non-existent email', async () => {
+      await expect(repo.findByEmail('missing@example.com')).rejects.toThrow(AppNotFoundException)
     })
   })
 
@@ -102,8 +102,8 @@ describe('UserPrismaRepository (integration)', () => {
       expect(found.email).toBe('byid@example.com')
     })
 
-    it('should throw NotFoundException for non-existent id', async () => {
-      await expect(repo.findById(99999)).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException for non-existent id', async () => {
+      await expect(repo.findById(99999)).rejects.toThrow(AppNotFoundException)
     })
   })
 
@@ -162,8 +162,8 @@ describe('UserPrismaRepository (integration)', () => {
       expect(updated.id).toBe(created.id)
     })
 
-    it('should throw NotFoundException when updating non-existent user', async () => {
-      await expect(repo.updateRole(99999, 'admin')).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException when updating non-existent user', async () => {
+      await expect(repo.updateRole(99999, 'admin')).rejects.toThrow(AppNotFoundException)
     })
   })
 })

@@ -1,4 +1,3 @@
-import { NotFoundException } from '@nestjs/common'
 import { type DatabaseService } from '@taskflow/database'
 import {
   setupPostgresContainer,
@@ -6,6 +5,7 @@ import {
   truncateAllTables,
   type PrismaTestContext,
 } from '@taskflow/database/__tests__/prisma-test-helper'
+import { AppNotFoundException } from '@taskflow/share'
 
 import { TaskPrismaRepository } from './task-prisma.repository'
 
@@ -88,8 +88,8 @@ describe('TaskPrismaRepository (integration)', () => {
       expect(found.title).toBe('Find Me')
     })
 
-    it('should throw NotFoundException for non-existent id', async () => {
-      await expect(repo.findById(99999)).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException for non-existent id', async () => {
+      await expect(repo.findById(99999)).rejects.toThrow(AppNotFoundException)
     })
   })
 
@@ -158,8 +158,8 @@ describe('TaskPrismaRepository (integration)', () => {
       expect(updated.description).toBe('Now has description')
     })
 
-    it('should throw NotFoundException for non-existent task', async () => {
-      await expect(repo.update(99999, { title: 'Nope' })).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException for non-existent task', async () => {
+      await expect(repo.update(99999, { title: 'Nope' })).rejects.toThrow(AppNotFoundException)
     })
   })
 
@@ -172,11 +172,11 @@ describe('TaskPrismaRepository (integration)', () => {
       })
 
       await repo.delete(created.id)
-      await expect(repo.findById(created.id)).rejects.toThrow(NotFoundException)
+      await expect(repo.findById(created.id)).rejects.toThrow(AppNotFoundException)
     })
 
-    it('should throw NotFoundException for non-existent task', async () => {
-      await expect(repo.delete(99999)).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException for non-existent task', async () => {
+      await expect(repo.delete(99999)).rejects.toThrow(AppNotFoundException)
     })
   })
 
@@ -192,8 +192,8 @@ describe('TaskPrismaRepository (integration)', () => {
       expect(assigned.assigneeId).toBe(seedUserId)
     })
 
-    it('should throw NotFoundException for non-existent task', async () => {
-      await expect(repo.assign(99999, seedUserId)).rejects.toThrow(NotFoundException)
+    it('should throw AppNotFoundException for non-existent task', async () => {
+      await expect(repo.assign(99999, seedUserId)).rejects.toThrow(AppNotFoundException)
     })
   })
 })

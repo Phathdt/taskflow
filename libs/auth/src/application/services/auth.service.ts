@@ -1,7 +1,5 @@
-import { ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
-import { CustomConfigService } from '@taskflow/custom-config'
-import { generateToken } from '@taskflow/share'
-import { Role, USER_SERVICE, type IUserService, type User } from '@taskflow/user'
+import { AppConflictException, AppNotFoundException, AppUnauthorizedException, generateToken } from '@taskflow/share'
+import { Role, type IUserService, type User } from '@taskflow/user'
 
 import * as bcrypt from 'bcryptjs'
 
@@ -13,27 +11,30 @@ import {
   type LoginResult,
   type RegisterInput,
 } from '../../domain'
-import { JWT_TOKEN_SERVICE, SESSION_STORE_SERVICE } from '../../infras'
 
-@Injectable()
+export interface AuthServiceConfig {
+  bcryptRounds: number
+  sessionTtlSeconds: number
+}
+
 export class AuthService implements IAuthService {
   constructor(
-    @Inject(USER_SERVICE) private readonly userService: IUserService,
-    @Inject(JWT_TOKEN_SERVICE) private readonly jwtTokenService: IJwtTokenService,
-    @Inject(SESSION_STORE_SERVICE) private readonly sessionStore: ISessionStoreService,
-    private readonly configService: CustomConfigService
+    private readonly userService: IUserService,
+    private readonly jwtTokenService: IJwtTokenService,
+    private readonly sessionStore: ISessionStoreService,
+    private readonly config: AuthServiceConfig
   ) {}
 
   async register(input: RegisterInput): Promise<User> {
     try {
       await this.userService.findByEmail(input.email)
-      throw new ConflictException('Email already registered')
+      throw new AppConflictException('Email already registered')
     } catch (error) {
-      if (error instanceof ConflictException) throw error
-      if (!(error instanceof NotFoundException)) throw error
+      if (error instanceof AppConflictException) throw error
+      if (!(error instanceof AppNotFoundException)) throw error
     }
 
-    const hashedPassword = await bcrypt.hash(input.password, this.configService.auth.bcryptRounds)
+    const hashedPassword = await bcrypt.hash(input.password, this.config.bcryptRounds)
 
     return this.userService.create({
       email: input.email,
@@ -48,12 +49,12 @@ export class AuthService implements IAuthService {
     try {
       user = await this.userService.findByEmail(input.email)
     } catch {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new AppUnauthorizedException('Invalid credentials')
     }
 
     const isPasswordValid = await bcrypt.compare(input.password, user.password)
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new AppUnauthorizedException('Invalid credentials')
     }
 
     const subToken = generateToken()
@@ -69,7 +70,7 @@ export class AuthService implements IAuthService {
     // Store JWT signature in Redis for whitelist validation
     const parts = token.split('.')
     const signature = parts[2]
-    await this.sessionStore.save(user.id, subToken, signature, this.configService.auth.sessionTtlSeconds)
+    await this.sessionStore.save(user.id, subToken, signature, this.config.sessionTtlSeconds)
 
     return {
       accessToken: token,

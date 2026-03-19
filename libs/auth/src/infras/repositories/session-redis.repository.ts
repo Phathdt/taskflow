@@ -1,13 +1,9 @@
-import { InjectRedis } from '@nestjs-modules/ioredis'
-import { Injectable } from '@nestjs/common'
-
-import Redis from 'ioredis'
+import type Redis from 'ioredis'
 
 import { type ISessionStoreService } from '../../domain'
 
-@Injectable()
 export class SessionRedisRepository implements ISessionStoreService {
-  constructor(@InjectRedis() private readonly redis: Redis) {}
+  constructor(private readonly redis: Redis) {}
 
   async save(userId: number, subToken: string, signature: string, ttlSeconds: number): Promise<void> {
     const key = this._key(userId, subToken)

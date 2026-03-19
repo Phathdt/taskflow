@@ -1,21 +1,8 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-import { ForbiddenException } from '@nestjs/common'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { AppForbiddenException } from '@taskflow/share'
 
 import { TaskService } from './task.service'
 
 import { type ITaskRepository } from '../../domain'
-import { TASK_REPOSITORY } from '../../infras'
-
-// Mock @taskflow/user to avoid ESM uuid chain (user.module → database → custom-logger → uuid)
-// Use Symbol.for so it's globally shared between the mock and NestJS DI container
-jest.mock('@taskflow/user', () => ({
-  USER_SERVICE: Symbol.for('__test_USER_SERVICE__'),
-  Role: { ADMIN: 'admin', WORKER: 'worker' },
-}))
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { USER_SERVICE } = require('@taskflow/user')
 
 describe('TaskService', () => {
   let service: TaskService
@@ -35,8 +22,8 @@ describe('TaskService', () => {
     updatedAt: new Date(),
   }
 
-  beforeEach(async () => {
-    const mockTaskRepo: jest.Mocked<ITaskRepository> = {
+  beforeEach(() => {
+    taskRepo = {
       create: jest.fn(),
       findById: jest.fn(),
       findAll: jest.fn(),
@@ -45,19 +32,9 @@ describe('TaskService', () => {
       assign: jest.fn(),
     }
 
-    const mockUserService = { findById: jest.fn() }
+    userService = { findById: jest.fn() }
 
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TaskService,
-        { provide: TASK_REPOSITORY, useValue: mockTaskRepo },
-        { provide: USER_SERVICE, useValue: mockUserService },
-      ],
-    }).compile()
-
-    service = module.get<TaskService>(TaskService)
-    taskRepo = module.get(TASK_REPOSITORY)
-    userService = module.get(USER_SERVICE)
+    service = new TaskService(taskRepo, userService as never)
   })
 
   describe('create', () => {
@@ -99,7 +76,7 @@ describe('TaskService', () => {
 
     it('should throw for unassigned worker', async () => {
       taskRepo.findById.mockResolvedValue(mockTask)
-      await expect(service.findById(1, 99, 'worker')).rejects.toThrow(ForbiddenException)
+      await expect(service.findById(1, 99, 'worker')).rejects.toThrow(AppForbiddenException)
     })
   })
 
@@ -144,7 +121,7 @@ describe('TaskService', () => {
 
     it('should throw for unassigned worker', async () => {
       taskRepo.findById.mockResolvedValue(mockTask)
-      await expect(service.update(1, { status: 'in_progress' }, 99, 'worker')).rejects.toThrow(ForbiddenException)
+      await expect(service.update(1, { status: 'in_progress' }, 99, 'worker')).rejects.toThrow(AppForbiddenException)
     })
   })
 

@@ -1,4 +1,10 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
+import {
+  AppConflictException,
+  AppForbiddenException,
+  AppNotFoundException,
+  AppUnauthorizedException,
+} from '@taskflow/share'
 
 import { Response } from 'express'
 import { v7 as uuidv7 } from 'uuid'
@@ -30,7 +36,23 @@ export class ResponseExceptionFilter implements ExceptionFilter {
     let message = 'Internal server error'
     let code = 'INTERNAL_SERVER_ERROR'
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof AppNotFoundException) {
+      status = HttpStatus.NOT_FOUND
+      code = 'NOT_FOUND'
+      message = exception.message
+    } else if (exception instanceof AppForbiddenException) {
+      status = HttpStatus.FORBIDDEN
+      code = 'FORBIDDEN'
+      message = exception.message
+    } else if (exception instanceof AppUnauthorizedException) {
+      status = HttpStatus.UNAUTHORIZED
+      code = 'UNAUTHORIZED'
+      message = exception.message
+    } else if (exception instanceof AppConflictException) {
+      status = HttpStatus.CONFLICT
+      code = 'CONFLICT'
+      message = exception.message
+    } else if (exception instanceof HttpException) {
       status = exception.getStatus()
       code = httpStatusToCode[status] || 'UNKNOWN_ERROR'
       const body = exception.getResponse() as string | { message?: string | string[] }

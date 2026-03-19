@@ -1,4 +1,5 @@
 export * from './common'
+export * from './exceptions'
 export * from './interceptors'
 export * from './queue'
 export * from './decorator'

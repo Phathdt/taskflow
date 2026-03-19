@@ -1,16 +1,30 @@
 import { Module, type Provider } from '@nestjs/common'
-import { DatabaseModule } from '@taskflow/database'
-import { UserModule } from '@taskflow/user'
+import { DatabaseModule, DatabaseService } from '@taskflow/database'
+import { USER_SERVICE, UserModule, type IUserService } from '@taskflow/user'
 
 import { TaskService } from './application'
+import { type ITaskRepository } from './domain'
 import { TASK_REPOSITORY, TASK_SERVICE, TaskPrismaRepository } from './infras'
 
-const services: Provider[] = [{ provide: TASK_SERVICE, useClass: TaskService }]
-const repositories: Provider[] = [{ provide: TASK_REPOSITORY, useClass: TaskPrismaRepository }]
+const repositories: Provider[] = [
+  {
+    provide: TASK_REPOSITORY,
+    useFactory: (db: DatabaseService) => new TaskPrismaRepository(db),
+    inject: [DatabaseService],
+  },
+]
+
+const services: Provider[] = [
+  {
+    provide: TASK_SERVICE,
+    useFactory: (taskRepo: ITaskRepository, userService: IUserService) => new TaskService(taskRepo, userService),
+    inject: [TASK_REPOSITORY, USER_SERVICE],
+  },
+]
 
 @Module({
   imports: [DatabaseModule, UserModule],
-  providers: [...services, ...repositories],
+  providers: [...repositories, ...services],
   exports: [TASK_SERVICE],
 })
 export class TaskModule {}

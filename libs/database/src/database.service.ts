@@ -48,7 +48,9 @@ export class DatabaseService extends PrismaClient implements OnModuleInit, OnMod
     })
 
     // Create driver adapter for Prisma 7
-    const adapter = new PrismaPg(pool)
+    // Cast needed due to @types/pg version mismatch between root and @prisma/adapter-pg
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adapter = new PrismaPg(pool as any)
 
     const logLevel = configService.log.level || 'info'
     const prismaLogLevels = DatabaseService.mapLogLevelToPrisma(logLevel)

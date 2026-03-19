@@ -1,17 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { DatabaseService, User as UserPrisma } from '@taskflow/database'
-import { createPaginationResponse, type Paginated, type PaginationRequest } from '@taskflow/share'
+import { type DatabaseService, type User as UserPrisma } from '@taskflow/database'
+import { AppNotFoundException, createPaginationResponse, type Paginated, type PaginationRequest } from '@taskflow/share'
 
 import { type IUserRepository, type RoleType, type User, type UserWithPassword } from '../../domain'
 
-@Injectable()
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly db: DatabaseService) {}
 
   async findByEmail(email: string): Promise<UserWithPassword> {
     const user = await this.db.user.findUnique({ where: { email } })
     if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`)
+      throw new AppNotFoundException(`User with email ${email} not found`)
     }
     return this._toUserWithPassword(user)
   }
@@ -19,7 +17,7 @@ export class UserPrismaRepository implements IUserRepository {
   async findById(id: number): Promise<User> {
     const user = await this.db.user.findUnique({ where: { id } })
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`)
+      throw new AppNotFoundException(`User with ID ${id} not found`)
     }
     return this._toUser(user)
   }

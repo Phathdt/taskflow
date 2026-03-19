@@ -17,6 +17,10 @@ This is a NestJS starter kit. It's built as a **Turborepo** monorepo with yarn w
   - `src/middlewares/` - Basic auth middleware
   - `src/processors/` - BullMQ job processors (e.g. task-monitor)
   - `src/schedulers/` - BullMQ schedulers (e.g. task-monitor)
+- `apps/worker/` - Temporal workflow worker service
+  - `src/workflows/` - Temporal workflow definitions
+  - `src/activities/` - Temporal activity implementations
+  - `src/config.ts` - Temporal connection configuration
 - `libs/` - Modular libraries organized by domain:
   - `auth/` - JWT authentication, bcrypt, Redis session whitelist
   - `user/` - User entity, roles (admin/worker), Prisma repository
@@ -33,6 +37,7 @@ This is a NestJS starter kit. It's built as a **Turborepo** monorepo with yarn w
 - **Database**: PostgreSQL with Prisma ORM (generates types)
 - **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
 - **Queue**: BullMQ for background job processing and scheduling
+- **Workflows**: Temporal for distributed workflow orchestration (worker app)
 - **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
 - **API Docs**: Swagger UI at `/swagger`, Scalar reference at `/reference`
@@ -43,9 +48,11 @@ This is a NestJS starter kit. It's built as a **Turborepo** monorepo with yarn w
 
 ```bash
 yarn dev                # Start API service in dev mode (uses nodemon)
+yarn worker:dev         # Start Temporal worker in dev mode
 yarn build              # Build all workspaces with Turborepo
 yarn build:prod         # Build with type checking
 yarn api:build          # Build only the API service
+yarn worker:build       # Build only the worker service
 ```
 
 ### Database Operations
@@ -79,7 +86,9 @@ turbo run lint          # Lint all workspaces
 ### Docker Services
 
 ```bash
-docker-compose up -d postgres-db redis-db    # Start required services
+docker-compose up -d postgres-db redis-db                    # Start core services
+docker-compose up -d temporal-db temporal temporal-ui         # Start Temporal stack
+docker-compose up -d worker                                  # Start Temporal worker
 ```
 
 ## Code Standards
@@ -134,8 +143,9 @@ After making code changes:
 
 Required services:
 
-- PostgreSQL v16+ (Docker port 15432)
-- Redis v7.2+ (Docker port 16379)
+- PostgreSQL v16+ (Docker port 5432)
+- Redis v7.2+ (Docker port 6379)
+- Temporal Server (Docker port 7233) - for workflow execution
 - Node.js v22+
 
 Key environment variables in `.env`:
@@ -143,3 +153,6 @@ Key environment variables in `.env`:
 - `DATABASE_URL` - PostgreSQL connection
 - `REDIS_URL` - Redis connection
 - `APP_PORT` - API port (default: 3000)
+- `TEMPORAL_ADDRESS` - Temporal server address (default: localhost:7233)
+- `TEMPORAL_NAMESPACE` - Temporal namespace (default: default)
+- `TEMPORAL_TASK_QUEUE` - Temporal task queue (default: taskflow-queue)

@@ -1,6 +1,6 @@
 # TaskFlow
 
-A task management API built as a Turborepo monorepo with NestJS, TypeScript, PostgreSQL (via Prisma), and Redis.
+A task management API built as a Turborepo monorepo with NestJS, TypeScript, PostgreSQL (via Prisma), Redis, and Temporal workflows.
 
 ## Architecture Overview
 
@@ -9,14 +9,19 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 ```
 .
 ├── apps/
-│   └── api/                    # Main NestJS API service
+│   ├── api/                    # Main NestJS API service
+│   │   └── src/
+│   │       ├── controllers/    # HTTP route handlers
+│   │       ├── guards/         # Auth and role guards
+│   │       ├── interceptors/   # Response formatting, trace ID
+│   │       ├── middlewares/    # Basic auth middleware
+│   │       ├── processors/     # BullMQ job processors
+│   │       └── schedulers/     # BullMQ schedulers
+│   └── worker/                 # Temporal workflow worker service
 │       └── src/
-│           ├── controllers/    # HTTP route handlers
-│           ├── guards/         # Auth and role guards
-│           ├── interceptors/   # Response formatting, trace ID
-│           ├── middlewares/    # Basic auth middleware
-│           ├── processors/     # BullMQ job processors
-│           └── schedulers/     # BullMQ schedulers
+│           ├── workflows/      # Temporal workflow definitions
+│           ├── activities/     # Temporal activity implementations
+│           └── config.ts       # Temporal connection configuration
 ├── libs/
 │   ├── auth/                   # Authentication (JWT, sessions, guards)
 │   ├── user/                   # User domain (entities, repository, service)
@@ -50,6 +55,7 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 - **Database**: PostgreSQL with Prisma ORM
 - **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
 - **Queue**: BullMQ for background job processing and scheduling
+- **Workflows**: Temporal (v1.15) for distributed workflow orchestration
 - **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
 - **API Docs**: Swagger UI at `/swagger`, Scalar reference at `/reference`
@@ -91,6 +97,7 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 - Node.js v22+
 - PostgreSQL v16+
 - Redis v7.2+
+- Temporal Server (via Docker)
 - Yarn 1.22+
 
 ## Getting Started
@@ -141,6 +148,7 @@ REDIS__URL=redis://127.0.0.1:6379
 
 ```bash
 docker-compose up -d postgres-db redis-db
+docker-compose up -d temporal-db temporal temporal-ui   # For Temporal workflows
 ```
 
 4. **Database Setup**
@@ -155,9 +163,10 @@ yarn db:seed        # Seed admin user (admin@taskflow.local / admin123)
 
 ```bash
 yarn dev            # Start API in development mode
+yarn worker:dev     # Start Temporal worker (separate terminal)
 ```
 
-API available at `http://localhost:3000`. Swagger docs at `http://localhost:3000/swagger`.
+API available at `http://localhost:3000`. Swagger docs at `http://localhost:3000/swagger`. Temporal UI at `http://localhost:8080`.
 
 ## Development Commands
 
@@ -165,6 +174,7 @@ API available at `http://localhost:3000`. Swagger docs at `http://localhost:3000
 
 ```bash
 yarn dev              # Start API service in dev mode
+yarn worker:dev       # Start Temporal worker in dev mode
 yarn build            # Build all packages
 yarn build:prod       # Typecheck + build for production
 ```
@@ -231,22 +241,26 @@ Covers:
 ### Start Required Services
 
 ```bash
-docker-compose up -d postgres-db redis-db
+docker-compose up -d postgres-db redis-db                    # Core services
+docker-compose up -d temporal-db temporal temporal-ui         # Temporal stack
 ```
 
-### Build Docker Image
+### Build Docker Images
 
 ```bash
-docker build --build-arg APP_NAME=api -t taskflow:latest .
+docker-compose build api       # Build API image
+docker-compose build worker    # Build Worker image
 ```
 
-Final image: **~143MB** (multi-stage build with Node.js 24 Alpine)
+Each app has its own Dockerfile in `apps/<app>/Dockerfile` (multi-stage build with Node.js Alpine).
 
 ### Run Full Stack
 
 ```bash
 docker-compose up
 ```
+
+Services: API (`:3000`), Temporal UI (`:8080`), PostgreSQL (`:5432`), Redis (`:6379`), Temporal Server (`:7233`).
 
 ## Contributing
 

@@ -1,10 +1,8 @@
-import { NotFoundException } from '@nestjs/common'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { AppForbiddenException, AppNotFoundException } from '@taskflow/share'
 
 import { UserService } from './user.service'
 
 import { type IUserRepository } from '../../domain'
-import { USER_REPOSITORY } from '../../infras/di'
 
 describe('UserService', () => {
   let service: UserService
@@ -19,8 +17,8 @@ describe('UserService', () => {
     updatedAt: new Date(),
   }
 
-  beforeEach(async () => {
-    const mockRepo: jest.Mocked<IUserRepository> = {
+  beforeEach(() => {
+    repo = {
       findByEmail: jest.fn(),
       findById: jest.fn(),
       create: jest.fn(),
@@ -28,12 +26,7 @@ describe('UserService', () => {
       updateRole: jest.fn(),
     }
 
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService, { provide: USER_REPOSITORY, useValue: mockRepo }],
-    }).compile()
-
-    service = module.get<UserService>(UserService)
-    repo = module.get(USER_REPOSITORY)
+    service = new UserService(repo)
   })
 
   describe('findById', () => {
@@ -44,9 +37,9 @@ describe('UserService', () => {
       expect(repo.findById).toHaveBeenCalledWith(1)
     })
 
-    it('should propagate NotFoundException', async () => {
-      repo.findById.mockRejectedValue(new NotFoundException())
-      await expect(service.findById(999)).rejects.toThrow(NotFoundException)
+    it('should propagate AppNotFoundException', async () => {
+      repo.findById.mockRejectedValue(new AppNotFoundException())
+      await expect(service.findById(999)).rejects.toThrow(AppNotFoundException)
     })
   })
 
@@ -66,13 +59,12 @@ describe('UserService', () => {
     it('should update and return user', async () => {
       const updated = { ...mockUser, role: 'admin' as const }
       repo.updateRole.mockResolvedValue(updated)
-      const result = await service.updateRole(1, 'admin', 99) // requesterId = 99 (different user)
+      const result = await service.updateRole(1, 'admin', 99)
       expect(result.role).toBe('admin')
     })
 
-    it('should throw ForbiddenException when changing own role', async () => {
-      const { ForbiddenException } = await import('@nestjs/common')
-      await expect(service.updateRole(1, 'admin', 1)).rejects.toThrow(ForbiddenException)
+    it('should throw AppForbiddenException when changing own role', async () => {
+      await expect(service.updateRole(1, 'admin', 1)).rejects.toThrow(AppForbiddenException)
     })
   })
 

@@ -35,7 +35,8 @@ export async function setupPostgresContainer(): Promise<PrismaTestContext> {
   await pool.query(migrationSql)
 
   // Create PrismaClient with pg adapter pointed at the container
-  const adapter = new PrismaPg(pool)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const adapter = new PrismaPg(pool as any)
   const prismaClient = new PrismaClient({ adapter })
   await prismaClient.$connect()
 

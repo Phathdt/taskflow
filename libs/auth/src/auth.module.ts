@@ -1,16 +1,45 @@
-import { RedisModule } from '@nestjs-modules/ioredis'
+import { getRedisConnectionToken, RedisModule } from '@nestjs-modules/ioredis'
 import { Module, type Provider } from '@nestjs/common'
-import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt'
+import { JwtModule, JwtService, type JwtModuleOptions } from '@nestjs/jwt'
 import { CustomConfigModule, CustomConfigService } from '@taskflow/custom-config'
-import { UserModule } from '@taskflow/user'
+import { USER_SERVICE, UserModule, type IUserService } from '@taskflow/user'
 
-import { AuthService, JwtTokenService } from './application'
+import Redis from 'ioredis'
+
+import { AuthService, JwtTokenService, type AuthServiceConfig } from './application'
+import { type IJwtTokenService, type ISessionStoreService } from './domain'
 import { AUTH_SERVICE, JWT_TOKEN_SERVICE, SESSION_STORE_SERVICE, SessionRedisRepository } from './infras'
 
+const repositories: Provider[] = [
+  {
+    provide: SESSION_STORE_SERVICE,
+    useFactory: (redis: Redis) => new SessionRedisRepository(redis),
+    inject: [getRedisConnectionToken()],
+  },
+]
+
 const services: Provider[] = [
-  { provide: AUTH_SERVICE, useClass: AuthService },
-  { provide: JWT_TOKEN_SERVICE, useClass: JwtTokenService },
-  { provide: SESSION_STORE_SERVICE, useClass: SessionRedisRepository },
+  {
+    provide: JWT_TOKEN_SERVICE,
+    useFactory: (jwtService: JwtService) => new JwtTokenService(jwtService),
+    inject: [JwtService],
+  },
+  {
+    provide: AUTH_SERVICE,
+    useFactory: (
+      userService: IUserService,
+      jwtTokenService: IJwtTokenService,
+      sessionStore: ISessionStoreService,
+      configService: CustomConfigService
+    ) => {
+      const config: AuthServiceConfig = {
+        bcryptRounds: configService.auth.bcryptRounds,
+        sessionTtlSeconds: configService.auth.sessionTtlSeconds,
+      }
+      return new AuthService(userService, jwtTokenService, sessionStore, config)
+    },
+    inject: [USER_SERVICE, JWT_TOKEN_SERVICE, SESSION_STORE_SERVICE, CustomConfigService],
+  },
 ]
 
 @Module({
@@ -36,7 +65,7 @@ const services: Provider[] = [
       inject: [CustomConfigService],
     }),
   ],
-  providers: [...services],
+  providers: [...repositories, ...services],
   exports: [AUTH_SERVICE, JWT_TOKEN_SERVICE, SESSION_STORE_SERVICE],
 })
 export class AuthModule {}
