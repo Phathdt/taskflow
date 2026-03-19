@@ -12,9 +12,9 @@
   "dependencies": {
     "@taskflow/database": "*",
     "@taskflow/share": "*",
-    "@nestjs/common": "^11.1.16",
-    "@nestjs/core": "^11.1.16",
-    "@nestjs/platform-express": "^11.1.16",
+    "@nestjs/common": "^11.1.17",
+    "@nestjs/core": "^11.1.17",
+    "@nestjs/platform-express": "^11.1.17",
     "@nestjs/swagger": "^11.2.6",
     "nestjs-zod": "^5.1.1",
     "reflect-metadata": "^0.2.2",
@@ -26,10 +26,10 @@
     "rxjs": "^7.0.0"
   },
   "devDependencies": {
-    "@nestjs/testing": "^11.1.16",
+    "@nestjs/testing": "^11.1.17",
     "@types/jest": "^30.0.0",
-    "@types/node": "~25.3.5",
-    "jest": "^30.2.0",
+    "@types/node": "~25.5.0",
+    "jest": "^30.3.0",
     "ts-jest": "^29.4.6",
     "typescript": "~5.9.3"
   }
