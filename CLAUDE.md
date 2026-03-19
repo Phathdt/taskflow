@@ -10,24 +10,22 @@ This is a NestJS starter kit. It's built as a **Turborepo** monorepo with yarn w
 
 ### Monorepo Structure
 
-- `apps/api/` - Main NestJS API service
+- `apps/api/` - Main NestJS API service (HTTP only, no background jobs)
   - `src/controllers/` - HTTP route handlers
   - `src/guards/` - Auth and role guards
   - `src/interceptors/` - Response formatting, trace ID
   - `src/middlewares/` - Basic auth middleware
-  - `src/processors/` - BullMQ job processors (e.g. task-monitor)
-  - `src/schedulers/` - BullMQ schedulers (e.g. task-monitor)
-- `apps/worker/` - Temporal workflow worker service
-  - `src/workflows/` - Temporal workflow definitions
-  - `src/activities/` - Temporal activity implementations
+- `apps/worker/` - Temporal workflow worker service (background jobs)
+  - `src/workflows/` - Temporal workflow definitions (e.g. task-monitor)
+  - `src/activities/` - Temporal activity implementations (e.g. check-processing-tasks)
   - `src/config.ts` - Temporal connection configuration
 - `libs/` - Modular libraries organized by domain:
   - `auth/` - JWT authentication, bcrypt, Redis session whitelist
   - `user/` - User entity, roles (admin/worker), Prisma repository
   - `task/` - Task entity, status, priority, Prisma repository
   - `notification/` - Notification library (in progress)
-  - `custom-config/` - YAML-based configuration with env override
-  - `custom-logger/` - Pino-based structured logging
+  - `custom-config/` - YAML-based configuration with env override (framework-agnostic)
+  - `custom-logger/` - Pino-based structured logging (EnhancedLogger for NestJS, SimpleLogger for Worker)
   - `database/` - Prisma ORM and PostgreSQL integration
   - `share/` - Shared utilities, decorators, and types
 
@@ -36,8 +34,7 @@ This is a NestJS starter kit. It's built as a **Turborepo** monorepo with yarn w
 - **Framework**: NestJS with decorators and dependency injection
 - **Database**: PostgreSQL with Prisma ORM (generates types)
 - **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
-- **Queue**: BullMQ for background job processing and scheduling
-- **Workflows**: Temporal for distributed workflow orchestration (worker app)
+- **Workflows**: Temporal (v1.15) for background jobs and distributed workflow orchestration
 - **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
 - **API Docs**: Swagger UI at `/swagger`, Scalar reference at `/reference`

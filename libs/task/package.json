@@ -14,8 +14,6 @@
     "@taskflow/share": "*",
     "@taskflow/user": "*",
     "@nestjs/common": "^11.1.17",
-    "@nestjs/core": "^11.1.17",
-    "@nestjs/platform-express": "^11.1.17",
     "@nestjs/swagger": "^11.2.6",
     "nestjs-zod": "^5.1.1",
     "reflect-metadata": "^0.2.2",

@@ -9,18 +9,16 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 ```
 .
 ├── apps/
-│   ├── api/                    # Main NestJS API service
+│   ├── api/                    # Main NestJS API service (HTTP only)
 │   │   └── src/
 │   │       ├── controllers/    # HTTP route handlers
 │   │       ├── guards/         # Auth and role guards
 │   │       ├── interceptors/   # Response formatting, trace ID
-│   │       ├── middlewares/    # Basic auth middleware
-│   │       ├── processors/     # BullMQ job processors
-│   │       └── schedulers/     # BullMQ schedulers
-│   └── worker/                 # Temporal workflow worker service
+│   │       └── middlewares/    # Basic auth middleware
+│   └── worker/                 # Temporal workflow worker (background jobs)
 │       └── src/
-│           ├── workflows/      # Temporal workflow definitions
-│           ├── activities/     # Temporal activity implementations
+│           ├── workflows/      # Workflow definitions (e.g. task-monitor)
+│           ├── activities/     # Activity implementations (e.g. check-processing-tasks)
 │           └── config.ts       # Temporal connection configuration
 ├── libs/
 │   ├── auth/                   # Authentication (JWT, sessions, guards)
@@ -44,8 +42,8 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 | `@taskflow/user` | User entity, roles (admin/worker), Prisma repository |
 | `@taskflow/task` | Task entity, status (pending/in_progress/completed/cancelled), priority (low/medium/high/urgent) |
 | `@taskflow/notification` | Notification library (in progress) |
-| `@taskflow/custom-config` | YAML config loading (`config/config.yml`) with typed interfaces |
-| `@taskflow/custom-logger` | Pino-based logger with JSON format support |
+| `@taskflow/custom-config` | YAML config loading (`config/config.yml`) with typed interfaces (framework-agnostic) |
+| `@taskflow/custom-logger` | Pino-based logger — `EnhancedLogger` for NestJS, `SimpleLogger` for Worker |
 | `@taskflow/database` | Prisma client and database module |
 | `@taskflow/share` | Response decorators, interceptors, error types, utility functions |
 
@@ -54,8 +52,7 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 - **Framework**: NestJS with decorators and dependency injection
 - **Database**: PostgreSQL with Prisma ORM
 - **Cache/Sessions**: Redis (via `@nestjs-modules/ioredis` and `@keyv/redis`)
-- **Queue**: BullMQ for background job processing and scheduling
-- **Workflows**: Temporal (v1.15) for distributed workflow orchestration
+- **Workflows**: Temporal (v1.15) for background jobs and distributed workflow orchestration
 - **Validation**: Zod schemas with `nestjs-zod`
 - **Build**: Turborepo + Rolldown bundler
 - **API Docs**: Swagger UI at `/swagger`, Scalar reference at `/reference`

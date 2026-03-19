@@ -48,6 +48,5 @@ module.exports = {
     // /^teardown.*$/,     // Teardown methods
     // /^handle.*$/,       // Handler methods
     // /^on.*$/            // Event handler methods starting with 'on'
-    /^process$/, // BullMQ processor methods called by WorkerHost
   ],
 }
