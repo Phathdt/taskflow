@@ -1,15 +1,13 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { Injectable, Logger } from '@nestjs/common'
 
 import * as yaml from 'js-yaml'
 
-import { AppConfig } from './config.interface'
+import { type AppConfig } from './config.interface'
 import { camelToSnakeCase, convertToCamelCase } from './utils'
 
-@Injectable()
+// Framework-agnostic config service — usable in both NestJS and Temporal Worker
 export class CustomConfigService {
-  private readonly logger = new Logger(CustomConfigService.name)
   private _config!: AppConfig
   private proxyCache = new WeakMap<object, object>()
 
@@ -104,7 +102,6 @@ export class CustomConfigService {
   private loadConfig(): void {
     try {
       const projectRoot = this.findProjectRoot()
-      // Load config from config/config.yml
       const configPath = path.join(projectRoot, 'config', 'config.yml')
 
       if (!fs.existsSync(configPath)) {
@@ -121,10 +118,10 @@ export class CustomConfigService {
       this._config = convertToCamelCase(rawConfig) as AppConfig
       this.overrideWithEnv(this._config as unknown as Record<string, unknown>)
 
-      this.logger.log('Configuration loaded successfully from config.yml')
+      console.log('[CustomConfig] Configuration loaded successfully from config.yml')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'
-      this.logger.error('Failed to load configuration', message)
+      console.error('[CustomConfig] Failed to load configuration', message)
       throw new Error(`Failed to load configuration: ${message}`)
     }
   }
@@ -180,28 +177,25 @@ export class CustomConfigService {
       return value === 'replace_me' || value === '' || value === null || value === undefined
     }
 
-    // Database validation
     if (isPlaceholder(this._config.database?.url)) {
       errors.push('database.url must be configured (set DATABASE__URL env var)')
     }
 
-    // Host validation
     if (!this._config.host?.port || this._config.host.port <= 0) {
       errors.push('host.port must be a positive number')
     }
 
-    // Redis validation
     if (isPlaceholder(this._config.redis?.url)) {
       errors.push('redis.url must be configured (set REDIS__URL env var)')
     }
 
     if (errors.length > 0) {
       const errorMessage = `Configuration validation failed:\n${errors.map((e) => `  - ${e}`).join('\n')}`
-      this.logger.error(errorMessage)
+      console.error(`[CustomConfig] ${errorMessage}`)
       throw new Error(errorMessage)
     }
 
-    this.logger.log('Configuration validation passed')
+    console.log('[CustomConfig] Configuration validation passed')
   }
 }
 

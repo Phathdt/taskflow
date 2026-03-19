@@ -4,7 +4,12 @@ import { CustomConfigService } from './custom-config.service'
 
 @Global()
 @Module({
-  providers: [CustomConfigService],
+  providers: [
+    {
+      provide: CustomConfigService,
+      useFactory: () => new CustomConfigService(),
+    },
+  ],
   exports: [CustomConfigService],
 })
 export class CustomConfigModule {}

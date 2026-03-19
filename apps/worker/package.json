@@ -12,6 +12,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@taskflow/custom-config": "*",
+    "@taskflow/custom-logger": "*",
     "@taskflow/database": "*",
     "@prisma/adapter-pg": "^7.5.0",
     "@temporalio/client": "^1.15.0",

@@ -1,15 +1,34 @@
 import { PrismaPg } from '@prisma/adapter-pg'
+import { CustomConfigService } from '@taskflow/custom-config'
+import { SimpleLogger } from '@taskflow/custom-logger'
 import { PrismaClient } from '@taskflow/database'
 
 import { Pool } from 'pg'
 
-// Shared PrismaClient instance for activities (reused across invocations)
+// Shared instances for activities (reused across invocations)
 let prisma: PrismaClient | null = null
+let logger: SimpleLogger | null = null
+
+function getConfig(): CustomConfigService {
+  return new CustomConfigService()
+}
+
+function getLogger(): SimpleLogger {
+  if (!logger) {
+    const config = getConfig()
+    logger = new SimpleLogger({
+      level: config.log.level,
+      context: 'TaskMonitor',
+      enableJsonFormat: config.log.enableJsonFormat,
+    })
+  }
+  return logger
+}
 
 function getPrisma(): PrismaClient {
   if (!prisma) {
-    const databaseUrl = process.env.DATABASE_URL || process.env.DATABASE__URL || ''
-    const pool = new Pool({ connectionString: databaseUrl })
+    const config = getConfig()
+    const pool = new Pool({ connectionString: config.database.url })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adapter = new PrismaPg(pool as any)
     prisma = new PrismaClient({ adapter })
@@ -19,6 +38,7 @@ function getPrisma(): PrismaClient {
 
 export async function checkProcessingTasks(): Promise<string> {
   const db = getPrisma()
+  const log = getLogger()
 
   const inProgressTasks = await db.task.findMany({
     where: { status: 'in_progress' },
@@ -26,12 +46,10 @@ export async function checkProcessingTasks(): Promise<string> {
   })
 
   const message = `Found ${inProgressTasks.length} task(s) with status 'in_progress'`
-  console.log(`[TaskMonitor] ${message}`)
+  log.info(message)
 
   if (inProgressTasks.length > 0) {
-    console.log(
-      `[TaskMonitor] In-progress tasks: ${JSON.stringify(inProgressTasks.map((t) => ({ id: t.id, title: t.title })))}`
-    )
+    log.info(`In-progress tasks: ${JSON.stringify(inProgressTasks.map((t) => ({ id: t.id, title: t.title })))}`)
   }
 
   return message
