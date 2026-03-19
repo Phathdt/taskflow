@@ -1,7 +1,7 @@
 # =============================================================================
 # Stage 1: Builder - Build the application
 # =============================================================================
-FROM node:24-alpine3.22 AS builder
+FROM node:24-alpine3.23 AS builder
 WORKDIR /app
 
 ARG APP_NAME
@@ -36,7 +36,7 @@ RUN node scripts/collect-deps.js ${APP_NAME} package > /tmp/prod-package.json
 # =============================================================================
 # Stage 2: Deps - Install and clean production dependencies
 # =============================================================================
-FROM node:24-alpine3.22 AS deps
+FROM node:24-alpine3.23 AS deps
 WORKDIR /app
 
 # Copy flattened production package.json
@@ -58,7 +58,7 @@ RUN rm -rf node_modules/@angular-devkit \
 # =============================================================================
 # Stage 3: Runtime - Final minimal image
 # =============================================================================
-FROM node:24-alpine3.22
+FROM node:24-alpine3.23
 WORKDIR /app
 
 ARG APP_NAME

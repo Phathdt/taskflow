@@ -1,8 +1,9 @@
 services:
   api:
-    image: taskflow:latest
+    image: taskflow-api:latest
     build:
       context: .
+      dockerfile: apps/api/Dockerfile
       args:
         APP_NAME: api
     ports:
@@ -67,13 +68,10 @@ services:
       - temporal
 
   worker:
-    image: taskflow:latest
+    image: taskflow-worker:latest
     build:
       context: .
-      args:
-        APP_NAME: worker
-    env_file:
-      - .env
+      dockerfile: apps/worker/Dockerfile
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_NAMESPACE=default
