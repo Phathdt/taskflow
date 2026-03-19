@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies":["**/.env.*local", ".env"],
+  "globalDependencies": ["**/.env.*local", ".env"],
   "tasks": {
     "@apps/api#build": {
       "dependsOn": ["^build"],
@@ -11,6 +11,18 @@
     "@apps/api#build:prod": {
       "dependsOn": ["^build", "@apps/api#typecheck", "@apps/api#build"],
       "outputs": ["../../dist/apps/api/**"],
+      "outputLogs": "errors-only",
+      "env": ["NODE_ENV"]
+    },
+    "@apps/worker#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["../../dist/apps/worker/**"],
+      "outputLogs": "errors-only",
+      "env": ["NODE_ENV"]
+    },
+    "@apps/worker#build:prod": {
+      "dependsOn": ["^build", "@apps/worker#typecheck", "@apps/worker#build"],
+      "outputs": ["../../dist/apps/worker/**"],
       "outputLogs": "errors-only",
       "env": ["NODE_ENV"]
     },
@@ -57,8 +69,9 @@
     "PORT",
     "APP_PORT",
     "REDIS_URL",
-    "SOLANA_RPC_URL",
-    "ETHEREUM_RPC_URL",
-    "PRIVATE_KEY"
+    "PRIVATE_KEY",
+    "TEMPORAL_ADDRESS",
+    "TEMPORAL_NAMESPACE",
+    "TEMPORAL_TASK_QUEUE"
   ]
 }

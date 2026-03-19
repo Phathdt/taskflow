@@ -1,6 +1,6 @@
 export * from './common'
 export * from './interceptors'
+export * from './queue'
 export * from './decorator'
 export * from './types'
 export * from './utils'
-export * from './queue'

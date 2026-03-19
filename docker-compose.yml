@@ -28,3 +28,65 @@ services:
     image: redis:7.2-alpine
     ports:
       - "6379:6379"
+
+  temporal-db:
+    image: postgres:16.2-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_DB: temporal
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=temporal-db
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    depends_on:
+      - temporal-db
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      - temporal
+
+  worker:
+    image: taskflow:latest
+    build:
+      context: .
+      args:
+        APP_NAME: worker
+    env_file:
+      - .env
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+      - TEMPORAL_TASK_QUEUE=taskflow-queue
+    depends_on:
+      - temporal
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:latest
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+    stdin_open: true
+    tty: true

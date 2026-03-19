@@ -1,1 +1,1 @@
-export { TaskMonitorProcessor } from './task-monitor.processor'
+export * from './task-monitor.processor'

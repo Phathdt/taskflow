@@ -12,6 +12,8 @@
     "dev": "turbo run dev --filter=@apps/api",
     "build": "turbo run build",
     "api:build": "turbo run build --filter=@apps/api",
+    "worker:dev": "turbo run dev --filter=@apps/worker",
+    "worker:build": "turbo run build --filter=@apps/worker",
     "build:prod": "turbo run build:prod",
     "test": "jest",
     "test:unit": "jest --testPathIgnorePatterns=integration",
