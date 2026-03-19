@@ -36,16 +36,16 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 
 ### Domain Libraries
 
-| Library | Purpose |
-|---------|---------|
-| `@taskflow/auth` | JWT authentication, bcrypt password hashing, Redis session whitelist, login/register/logout |
-| `@taskflow/user` | User entity, roles (admin/worker), Prisma repository |
-| `@taskflow/task` | Task entity, status (pending/in_progress/completed/cancelled), priority (low/medium/high/urgent) |
-| `@taskflow/notification` | Notification library (in progress) |
-| `@taskflow/custom-config` | YAML config loading (`config/config.yml`) with typed interfaces (framework-agnostic) |
-| `@taskflow/custom-logger` | Pino-based logger — `EnhancedLogger` for NestJS, `SimpleLogger` for Worker |
-| `@taskflow/database` | Prisma client and database module |
-| `@taskflow/share` | Response decorators, interceptors, error types, utility functions |
+| Library                   | Purpose                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------ |
+| `@taskflow/auth`          | JWT authentication, bcrypt password hashing, Redis session whitelist, login/register/logout      |
+| `@taskflow/user`          | User entity, roles (admin/worker), Prisma repository                                             |
+| `@taskflow/task`          | Task entity, status (pending/in_progress/completed/cancelled), priority (low/medium/high/urgent) |
+| `@taskflow/notification`  | Notification library (in progress)                                                               |
+| `@taskflow/custom-config` | YAML config loading (`config/config.yml`) with typed interfaces (framework-agnostic)             |
+| `@taskflow/custom-logger` | Pino-based logger — `EnhancedLogger` for NestJS, `SimpleLogger` for Worker                       |
+| `@taskflow/database`      | Prisma client and database module                                                                |
+| `@taskflow/share`         | Response decorators, interceptors, error types, utility functions                                |
 
 ### Key Dependencies
 
@@ -61,33 +61,33 @@ A task management API built as a Turborepo monorepo with NestJS, TypeScript, Pos
 
 ### Authentication
 
-| Method | Path | Auth | Role | Description |
-|--------|------|------|------|-------------|
-| `POST` | `/auth/register` | Public | - | Register a new user (default: worker) |
-| `POST` | `/auth/login` | Public | - | Login and receive JWT |
-| `POST` | `/auth/logout` | Required | Any | Invalidate all sessions |
-| `GET` | `/auth/me` | Required | Any | Get current user profile |
+| Method | Path             | Auth     | Role | Description                           |
+| ------ | ---------------- | -------- | ---- | ------------------------------------- |
+| `POST` | `/auth/register` | Public   | -    | Register a new user (default: worker) |
+| `POST` | `/auth/login`    | Public   | -    | Login and receive JWT                 |
+| `POST` | `/auth/logout`   | Required | Any  | Invalidate all sessions               |
+| `GET`  | `/auth/me`       | Required | Any  | Get current user profile              |
 
 ### User Management
 
-| Method | Path | Auth | Role | Description |
-|--------|------|------|------|-------------|
-| `GET` | `/users` | Required | Admin | List all users (paginated) |
-| `GET` | `/users/:id` | Required | Admin | Get user by ID |
-| `PATCH` | `/users/:id/role` | Required | Admin | Change user role |
+| Method  | Path              | Auth     | Role  | Description                |
+| ------- | ----------------- | -------- | ----- | -------------------------- |
+| `GET`   | `/users`          | Required | Admin | List all users (paginated) |
+| `GET`   | `/users/:id`      | Required | Admin | Get user by ID             |
+| `PATCH` | `/users/:id/role` | Required | Admin | Change user role           |
 
 ### Task Management
 
-| Method | Path | Auth | Role | Description |
-|--------|------|------|------|-------------|
-| `POST` | `/tasks` | Required | Admin | Create a task |
-| `GET` | `/tasks` | Required | Any* | List tasks (filtered by role) |
-| `GET` | `/tasks/:id` | Required | Any* | Get task by ID |
-| `PATCH` | `/tasks/:id` | Required | Any* | Update task |
-| `DELETE` | `/tasks/:id` | Required | Admin | Delete task |
-| `PATCH` | `/tasks/:id/assign` | Required | Admin | Assign task to user |
+| Method   | Path                | Auth     | Role  | Description                   |
+| -------- | ------------------- | -------- | ----- | ----------------------------- |
+| `POST`   | `/tasks`            | Required | Admin | Create a task                 |
+| `GET`    | `/tasks`            | Required | Any\* | List tasks (filtered by role) |
+| `GET`    | `/tasks/:id`        | Required | Any\* | Get task by ID                |
+| `PATCH`  | `/tasks/:id`        | Required | Any\* | Update task                   |
+| `DELETE` | `/tasks/:id`        | Required | Admin | Delete task                   |
+| `PATCH`  | `/tasks/:id/assign` | Required | Admin | Assign task to user           |
 
-*Any\* = Admin sees all; Worker sees only own/assigned resources.*
+_Any\* = Admin sees all; Worker sees only own/assigned resources._
 
 ## Prerequisites
 
@@ -229,6 +229,7 @@ yarn test:integration
 ```
 
 Covers:
+
 - `UserPrismaRepository` — CRUD, pagination, unique constraints against real PostgreSQL
 - `TaskPrismaRepository` — CRUD, filters, assignment against real PostgreSQL
 - `SessionRedisRepository` — save/get, TTL expiration, bulk removal against real Redis

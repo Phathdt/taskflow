@@ -10,11 +10,20 @@ import {
   type UpdateTaskInput,
 } from '../../domain'
 
+export interface TaskServiceCallbacks {
+  onTaskAssigned?: (task: Task) => Promise<void>
+}
+
 export class TaskService implements ITaskService {
+  private readonly callbacks: TaskServiceCallbacks
+
   constructor(
     private readonly taskRepo: ITaskRepository,
-    private readonly userService: IUserService
-  ) {}
+    private readonly userService: IUserService,
+    callbacks?: TaskServiceCallbacks
+  ) {
+    this.callbacks = callbacks ?? {}
+  }
 
   async create(data: CreateTaskInput): Promise<Task> {
     if (data.assigneeId) {
@@ -60,6 +69,13 @@ export class TaskService implements ITaskService {
 
   async assign(id: number, assigneeId: number): Promise<Task> {
     await this.userService.findById(assigneeId)
-    return this.taskRepo.assign(id, assigneeId)
+    const task = await this.taskRepo.assign(id, assigneeId)
+
+    if (this.callbacks.onTaskAssigned) {
+      // Fire-and-forget: don't block the response
+      this.callbacks.onTaskAssigned(task).catch(() => {})
+    }
+
+    return task
   }
 }

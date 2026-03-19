@@ -1,0 +1,22 @@
+{
+  "name": "@taskflow/notification",
+  "version": "1.0.0",
+  "private": true,
+  "main": "../../dist/libs/notification/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "rolldown -c",
+    "dev": "rolldown -c --watch",
+    "test": "jest --passWithNoTests"
+  },
+  "dependencies": {
+    "@taskflow/custom-logger": "*",
+    "@nestjs/common": "^11.1.17",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "~25.5.0",
+    "typescript": "~5.9.3"
+  }
+}

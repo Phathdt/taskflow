@@ -19,6 +19,7 @@
     "@taskflow/share": "*",
     "@taskflow/task": "*",
     "@taskflow/user": "*",
+    "@temporalio/client": "^1.15.0",
     "@keyv/redis": "^5.1.6",
     "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^11.1.17",

@@ -15,6 +15,7 @@
     "@taskflow/custom-config": "*",
     "@taskflow/custom-logger": "*",
     "@taskflow/database": "*",
+    "@taskflow/notification": "*",
     "@prisma/adapter-pg": "^7.5.0",
     "@temporalio/client": "^1.15.0",
     "@temporalio/worker": "^1.15.0",

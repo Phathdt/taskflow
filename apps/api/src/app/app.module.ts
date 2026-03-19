@@ -6,8 +6,8 @@ import { AuthModule } from '@taskflow/auth'
 import { CustomConfigModule, CustomConfigService } from '@taskflow/custom-config'
 import { CustomLoggerModule } from '@taskflow/custom-logger'
 import { DatabaseModule } from '@taskflow/database'
-import { TaskModule } from '@taskflow/task'
-import { UserModule } from '@taskflow/user'
+import { TASK_REPOSITORY, TASK_SERVICE, TaskModule, TaskService, type ITaskRepository, type Task } from '@taskflow/task'
+import { USER_SERVICE, UserModule, type IUserService } from '@taskflow/user'
 
 import { LoggerErrorInterceptor } from 'nestjs-pino'
 import { ZodValidationPipe } from 'nestjs-zod'
@@ -21,6 +21,7 @@ import {
   TraceIdInterceptor,
   ZodValidationExceptionFilter,
 } from '../interceptors'
+import { TemporalClientService } from '../services'
 
 @Module({
   imports: [
@@ -51,6 +52,23 @@ import {
     { provide: APP_FILTER, useClass: ZodValidationExceptionFilter },
     // Global pipes
     { provide: APP_PIPE, useClass: ZodValidationPipe },
+    // Temporal client for triggering workflows
+    TemporalClientService,
+    // Override TASK_SERVICE to wire onTaskAssigned callback
+    {
+      provide: TASK_SERVICE,
+      useFactory: (taskRepo: ITaskRepository, userService: IUserService, temporal: TemporalClientService) =>
+        new TaskService(taskRepo, userService, {
+          onTaskAssigned: async (task: Task) => {
+            await temporal.startWorkflow(
+              'taskAssignedNotificationWorkflow',
+              [{ taskId: task.id, taskTitle: task.title, assigneeId: task.assigneeId }],
+              `task-assigned-notification-${task.id}-${Date.now()}`
+            )
+          },
+        }),
+      inject: [TASK_REPOSITORY, USER_SERVICE, TemporalClientService],
+    },
   ],
   exports: [],
 })
