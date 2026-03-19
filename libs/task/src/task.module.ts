@@ -25,6 +25,6 @@ const services: Provider[] = [
 @Module({
   imports: [DatabaseModule, UserModule],
   providers: [...repositories, ...services],
-  exports: [TASK_SERVICE],
+  exports: [TASK_SERVICE, TASK_REPOSITORY],
 })
 export class TaskModule {}

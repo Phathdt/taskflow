@@ -9,7 +9,8 @@
       "@taskflow/share": ["libs/share/src/index"],
       "@taskflow/auth": ["libs/auth/src/index"],
       "@taskflow/user": ["libs/user/src/index"],
-      "@taskflow/task": ["libs/task/src/index"]
+      "@taskflow/task": ["libs/task/src/index"],
+      "@taskflow/notification": ["libs/notification/src/index"]
     }
   }
 }
