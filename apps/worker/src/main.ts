@@ -1,8 +1,24 @@
+import 'dotenv/config'
+
 import { Client, Connection } from '@temporalio/client'
 import { NativeConnection, Worker } from '@temporalio/worker'
 
 import * as activities from './activities'
 import { temporalConfig } from './config'
+
+// Schedules to clean up from previous versions
+const DEPRECATED_SCHEDULES = ['cron-sample-every-10s']
+
+async function cleanupDeprecatedSchedules(client: Client): Promise<void> {
+  for (const id of DEPRECATED_SCHEDULES) {
+    try {
+      await client.schedule.getHandle(id).delete()
+      console.log(`Deleted deprecated schedule: ${id}`)
+    } catch {
+      // Schedule doesn't exist, ignore
+    }
+  }
+}
 
 async function run() {
   const nativeConnection = await NativeConnection.connect({
@@ -17,32 +33,33 @@ async function run() {
     activities,
   })
 
-  // Start Temporal client to create the schedule
+  // Start Temporal client to manage schedules
   const clientConnection = await Connection.connect({ address: temporalConfig.address })
   const client = new Client({ connection: clientConnection, namespace: temporalConfig.namespace })
 
-  const scheduleId = 'cron-sample-every-10s'
-  const handle = client.schedule.getHandle(scheduleId)
+  // Clean up old schedules
+  await cleanupDeprecatedSchedules(client)
 
+  // Create task-monitor schedule
+  const scheduleId = 'task-monitor-every-1m'
   try {
-    // Delete existing schedule if any, then recreate
-    await handle.delete()
+    await client.schedule.getHandle(scheduleId).delete()
   } catch {
     // Schedule doesn't exist yet, ignore
   }
 
   await client.schedule.create({
     scheduleId,
-    spec: { intervals: [{ every: '10s' }] },
+    spec: { intervals: [{ every: '1m' }] },
     action: {
       type: 'startWorkflow',
-      workflowType: 'cronSampleWorkflow',
+      workflowType: 'taskMonitorWorkflow',
       taskQueue: temporalConfig.taskQueue,
     },
   })
 
   console.log(`Temporal worker started | queue=${temporalConfig.taskQueue} | ns=${temporalConfig.namespace}`)
-  console.log(`Schedule "${scheduleId}" created — runs every 10s`)
+  console.log(`Schedule "${scheduleId}" created — runs every 1m`)
   await worker.run()
 }
 
